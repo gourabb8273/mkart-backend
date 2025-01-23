@@ -15,11 +15,13 @@ jobs:
       - name: Set Up Docker
         uses: docker/setup-buildx-action@v2
 
+      - name: Set AWS Region
+        run: |
+          aws configure set region 'ap-south-1'  # Set the region using AWS CLI
+
       - name: Log in to Amazon ECR
         id: ecr-login
         uses: aws-actions/amazon-ecr-login@v1
-        with:
-          region: 'ap-south-1'# ${{ secrets.REGION }} Specify region using GitHub secret, or hard-code it like 'ap-south-1'
 
       - name: Build and Push User Service Image
         run: |
