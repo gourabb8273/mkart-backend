@@ -74,7 +74,17 @@ jobs:
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           AWS_REGION: ap-south-1
 
-      # Step 8: Check if the ECS service already exists
+# Step 8: Register the updated task definition 
+      - name: Register Task Definition
+        run: |
+          aws ecs register-task-definition \
+            --cli-input-json file://./user-service/task-def.json \
+            --region ap-south-1
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: ap-south-1
+      
       - name: Check if Service Exists
         id: check-service
         run: |
@@ -95,49 +105,51 @@ jobs:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           AWS_REGION: ap-south-1
-          
-      # Step 9 - Create or Update ECS Service with ALB
+      
       - name: Create or Update ECS Service with ALB
         run: |
-          if [ "true" == "true" ]; then
+          if [ "${{ steps.check-service.outputs.service-exists }}" == "true" ]; then
             echo "Updating ECS service with ALB..."
-        
-            # Ensure that $TASK_DEFINITION_ARN is passed and not empty
-            if [[ -n "$TASK_DEFINITION_ARN" ]]; then
-                # ECS Update Service
-                aws ecs update-service \
-                  --cluster my-microservices \  # Define your ECS cluster
-                  --service user-service \      # Specify the ECS service to update
-                  --task-definition "$TASK_DEFINITION_ARN" \  # Specify the task definition ARN for the service
-                  --desired-count 1 \           # Desired number of service tasks
-                  --load-balancers '[{"targetGroupArn":"arn:aws:elasticloadbalancing:ap-south-1:980921736494:targetgroup/ecs-tg/37c661d494e4ce68","containerName":"user-service","containerPort":3000}]' \
-                  --region ap-south-1 \         # Specify the AWS region
-                  --force-new-deployment        # Ensure a fresh deployment for service update
-          
-            else
-                echo "Error: TASK_DEFINITION_ARN is empty. Please set the Task Definition ARN."
-                exit 1
-            fi
+            # Update ECS Service and associate with ALB
+            aws ecs update-service \
+              --cluster my-microservices \
+              --service user-service \
+              --task-definition user-service:1 \  # Specify Task Definition ARN directly if not dynamic
+              --desired-count 1 \
+              --load-balancers '[{"targetGroupArn":"arn:aws:elasticloadbalancing:ap-south-1:980921736494:targetgroup/ecs-tg/37c661d494e4ce68","containerName":"user-service","containerPort":3000}]' \
+              --region ap-south-1 \
+              --force-new-deployment \
+              --health-check-grace-period-seconds 60   # Adjust grace period as needed
           else
             echo "Creating ECS service with ALB..."
-            
-            # ECS Create Service if the above condition is false
+            # Create ECS Service and associate with ALB
             aws ecs create-service \
-              --cluster my-microservices \         # Define your ECS cluster
-              --service-name user-service \        # Define the ECS service name to create
-              --task-definition "$TASK_DEFINITION_ARN" \   # Specify the Task Definition ARN
-              --desired-count 1 \                  # Number of tasks for service
-              --launch-type EC2 \                  # EC2 launch type, adjust according to your setup (FARGATE or EC2)
-              --load-balancers '[{"targetGroupArn":"arn:aws:elasticloadbalancing:ap-south-1:980921736494:targetgroup/ecs-tg/37c661d494e4ce68","containerName":"user-service","containerPort":3000}]' \ 
-              --region ap-south-1 \                # Define AWS region (India in this case)
-              --health-check-grace-period-seconds 60   # Optional, ensure grace period on health check for slow start
-        
-            # The creation command ensures the new service is provisioned and associated with the load balancer (ALB).
+              --cluster my-microservices \
+              --service-name user-service \
+              --task-definition user-service:1 \   # Specify Task Definition ARN directly if not dynamic
+              --desired-count 1 \
+              --launch-type EC2 \
+              --load-balancers '[{"targetGroupArn":"arn:aws:elasticloadbalancing:ap-south-1:980921736494:targetgroup/ecs-tg/37c661d494e4ce68","containerName":"user-service","containerPort":3000}]' \
+              --region ap-south-1 \
+              --health-check-grace-period-seconds 60   # Adjust grace period as needed
           fi
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           AWS_REGION: ap-south-1
+      
+      - name: Deploy to ECS
+        uses: aws-actions/amazon-ecs-deploy-task-definition@v1
+        with:
+          task-definition: ./user-service/task-def.json
+          service: user-service
+          cluster: my-microservices
+          wait-for-service-stability: true
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: ap-south-1
+
 
       # Step 10: Verify Target Registration in ALB Target Group
       - name: Verify Targets in ALB Target Group
