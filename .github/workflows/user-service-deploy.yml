@@ -37,10 +37,20 @@ jobs:
           docker build -t $IMAGE_URI ./user-service
           docker push $IMAGE_URI
 
-      # Step 5: Update the task definition with the new image URI
+     # Step 5: Update Task Definition (Create a new revision with the updated image URI)
       - name: Update Task Definition
         run: |
           sed -i 's#<IMAGE_URI>#${{ secrets.ECR_URI }}/user-service:latest#g' ./user-service/task-def.json
+          # Register new task definition
+          TASK_DEFINITION_ARN=$(aws ecs register-task-definition \
+            --cli-input-json file://./user-service/task-def.json \
+            --region ap-south-1 --query 'taskDefinition.taskDefinitionArn' --output text)
+          echo "Registered new task definition: $TASK_DEFINITION_ARN"
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: ap-south-1
+
 
       # Step 6: Attach CloudWatch Logs permissions to ECS Task Execution Role
       - name: Attach CloudWatch Logs Permissions to Task Execution Role
