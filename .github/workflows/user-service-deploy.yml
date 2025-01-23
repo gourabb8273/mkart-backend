@@ -36,11 +36,10 @@ jobs:
         run: |
           sed -i 's#<IMAGE_URI>#${{ secrets.ECR_URI }}/user-service:latest#g' ./user-service/task-def.json
 
-      - name: Register Task Definition (if not already registered)
+      - name: Register Task Definition
         run: |
           aws ecs register-task-definition \
-            --family user-service \
-            --container-definitions "file://./user-service/task-def.json" \
+            --cli-input-json file://./user-service/task-def.json \
             --region ap-south-1
 
       - name: Create ECS Service (if not already created)
