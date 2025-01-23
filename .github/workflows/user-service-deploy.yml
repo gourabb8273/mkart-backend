@@ -96,25 +96,27 @@ jobs:
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           AWS_REGION: ap-south-1
 
-       # Step 9: Create or Update ECS Service
+      # Step 9 - Create or Update ECS Service with ALB
       - name: Create or Update ECS Service with ALB
         run: |
           if [ "${{ steps.check-service.outputs.service-exists }}" == "true" ]; then
             echo "Updating ECS service with ALB..."
-            # Use the new task definition ARN from previous step
+            
+            # Ensure that $TASK_DEFINITION_ARN is passed here correctly
             aws ecs update-service \
               --cluster my-microservices \
               --service user-service \
-              --task-definition $TASK_DEFINITION_ARN \
+              --task-definition "$TASK_DEFINITION_ARN" \  # Ensure $TASK_DEFINITION_ARN is passed
               --desired-count 1 \
               --load-balancers "[{\"targetGroupArn\":\"arn:aws:elasticloadbalancing:ap-south-1:980921736494:targetgroup/ecs-tg/37c661d494e4ce68\",\"containerName\":\"user-service\",\"containerPort\":3000}]" \
               --region ap-south-1
           else
             echo "Creating ECS service with ALB..."
+            
             aws ecs create-service \
               --cluster my-microservices \
               --service-name user-service \
-              --task-definition $TASK_DEFINITION_ARN \
+              --task-definition "$TASK_DEFINITION_ARN" \  # Ensure $TASK_DEFINITION_ARN is passed
               --desired-count 1 \
               --launch-type EC2 \
               --load-balancers "[{\"targetGroupArn\":\"arn:aws:elasticloadbalancing:ap-south-1:980921736494:targetgroup/ecs-tg/37c661d494e4ce68\",\"containerName\":\"user-service\",\"containerPort\":3000}]" \
