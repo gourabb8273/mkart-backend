@@ -1,0 +1,19 @@
+{
+    "family": "order-service",
+    "containerDefinitions": [
+      {
+        "name": "order-service",
+        "image": "980921736494.dkr.ecr.ap-south-1.amazonaws.com/user-service:latest",
+        "memory": 512,
+        "cpu": 256,
+        "essential": true,
+        "portMappings": [
+          {
+            "containerPort": 3002,
+            "hostPort": 0
+          }
+        ]
+      }
+    ]
+  }
+  
