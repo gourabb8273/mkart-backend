@@ -126,19 +126,19 @@ jobs:
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           AWS_REGION: ap-south-1
 
-      # Step 11: Register Missing Targets (if needed)
-      - name: Register Targets Manually
-        run: |
-          INSTANCE_ID=$(aws ec2 describe-instances \
-            --filters "Name=tag:Name,Values=your-ecs-instance-tag" \
-            --query "Reservations[].Instances[].InstanceId" \
-            --output text --region ap-south-1)
-          PORT=3000
-          aws elbv2 register-targets \
-            --target-group-arn arn:aws:elasticloadbalancing:ap-south-1:980921736494:targetgroup/ecs-tg/37c661d494e4ce68 \
-            --targets Id=$INSTANCE_ID,Port=$PORT \
-            --region ap-south-1
-        env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          AWS_REGION: ap-south-1
+      # # Step 11: Register Missing Targets (if needed)
+      # - name: Register Targets Manually
+      #   run: |
+      #     INSTANCE_ID=$(aws ec2 describe-instances \
+      #       --filters "Name=tag:Name,Values=your-ecs-instance-tag" \
+      #       --query "Reservations[].Instances[].InstanceId" \
+      #       --output text --region ap-south-1)
+      #     PORT=3000
+      #     aws elbv2 register-targets \
+      #       --target-group-arn arn:aws:elasticloadbalancing:ap-south-1:980921736494:targetgroup/ecs-tg/37c661d494e4ce68 \
+      #       --targets Id=$INSTANCE_ID,Port=$PORT \
+      #       --region ap-south-1
+      #   env:
+      #     AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      #     AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      #     AWS_REGION: ap-south-1
