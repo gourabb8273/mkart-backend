@@ -86,7 +86,7 @@ jobs:
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           AWS_REGION: ap-south-1
 
-      # Step 9: Create or update ECS service, integrating with the Application Load Balancer
+          # Step 9: Create or Update ECS service and ensure ALB integration
       - name: Create or Update ECS Service with ALB
         run: |
           if [ "${{ steps.check-service.outputs.service-exists }}" == "true" ]; then
@@ -108,23 +108,35 @@ jobs:
               --launch-type EC2 \
               --load-balancers "[{\"targetGroupArn\":\"arn:aws:elasticloadbalancing:ap-south-1:980921736494:targetgroup/ecs-tg/37c661d494e4ce68\",\"containerName\":\"user-service\",\"containerPort\":3000}]" \
               --region ap-south-1
-            env:
-              AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-              AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-              AWS_REGION: ap-south-1
           fi
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           AWS_REGION: ap-south-1
 
-     # Step 10: Confirm ECS service status and ensure ALB integration
-      - name: Confirm ECS Service with ALB
+      # Step 10: Verify Target Registration in ALB Target Group
+      - name: Verify Targets in ALB Target Group
         run: |
-          echo "Verifying ECS service status with ALB integration..."
-          aws ecs describe-services \
-            --cluster my-microservices \
-            --services user-service \
+          echo "Checking target registration status in ALB target group..."
+          aws elbv2 describe-target-health \
+            --target-group-arn arn:aws:elasticloadbalancing:ap-south-1:980921736494:targetgroup/ecs-tg/37c661d494e4ce68 \
+            --region ap-south-1
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: ap-south-1
+
+      # Step 11: Register Missing Targets (if needed)
+      - name: Register Targets Manually
+        run: |
+          INSTANCE_ID=$(aws ec2 describe-instances \
+            --filters "Name=tag:Name,Values=your-ecs-instance-tag" \
+            --query "Reservations[].Instances[].InstanceId" \
+            --output text --region ap-south-1)
+          PORT=3000
+          aws elbv2 register-targets \
+            --target-group-arn arn:aws:elasticloadbalancing:ap-south-1:980921736494:targetgroup/ecs-tg/37c661d494e4ce68 \
+            --targets Id=$INSTANCE_ID,Port=$PORT \
             --region ap-south-1
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
