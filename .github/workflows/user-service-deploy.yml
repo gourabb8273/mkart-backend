@@ -111,27 +111,27 @@ jobs:
           if [ "${{ steps.check-service.outputs.service-exists }}" == "true" ]; then
             echo "Updating ECS service with ALB..."
             # Update ECS Service and associate with ALB
-            aws ecs update-service \
-              --cluster my-microservices \
-              --service user-service \
-              --task-definition user-service:1 \  # Specify Task Definition ARN directly if not dynamic
-              --desired-count 1 \
-              --load-balancers '[{"targetGroupArn":"arn:aws:elasticloadbalancing:ap-south-1:980921736494:targetgroup/ecs-tg/37c661d494e4ce68","containerName":"user-service","containerPort":3000}]' \
-              --region ap-south-1 \
-              --force-new-deployment \
-              --health-check-grace-period-seconds 60   # Adjust grace period as needed
+           aws ecs update-service \
+            --cluster my-microservices \
+            --service user-service \
+            --task-definition user-service:2 \
+            --desired-count 1 \
+            --load-balancers '[{"targetGroupArn":"arn:aws:elasticloadbalancing:ap-south-1:980921736494:targetgroup/ecs-tg/37c661d494e4ce68","containerName":"user-service","containerPort":3000}]' \
+            --region ap-south-1 \
+            --force-new-deployment
+
           else
             echo "Creating ECS service with ALB..."
             # Create ECS Service and associate with ALB
             aws ecs create-service \
               --cluster my-microservices \
               --service-name user-service \
-              --task-definition user-service:1 \   # Specify Task Definition ARN directly if not dynamic
+              --task-definition user-service:1 \ 
               --desired-count 1 \
               --launch-type EC2 \
               --load-balancers '[{"targetGroupArn":"arn:aws:elasticloadbalancing:ap-south-1:980921736494:targetgroup/ecs-tg/37c661d494e4ce68","containerName":"user-service","containerPort":3000}]' \
               --region ap-south-1 \
-              --health-check-grace-period-seconds 60   # Adjust grace period as needed
+              --health-check-grace-period-seconds 60  
           fi
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
