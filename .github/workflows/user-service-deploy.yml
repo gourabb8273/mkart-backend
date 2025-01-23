@@ -19,7 +19,7 @@ jobs:
         id: ecr-login
         uses: aws-actions/amazon-ecr-login@v1
         with:
-          region: ${{ secrets.REGION }}  # Specify region using GitHub secret, or hard-code it like 'ap-south-1'
+          region: 'ap-south-1'# ${{ secrets.REGION }} Specify region using GitHub secret, or hard-code it like 'ap-south-1'
 
       - name: Build and Push User Service Image
         run: |
