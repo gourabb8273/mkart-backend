@@ -95,8 +95,8 @@ jobs:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           AWS_REGION: ap-south-1
-
-            # Step 9 - Create or Update ECS Service with ALB
+          
+      # Step 9 - Create or Update ECS Service with ALB
       - name: Create or Update ECS Service with ALB
         run: |
           if [ "true" == "true" ]; then
@@ -118,7 +118,7 @@ jobs:
                 echo "Error: TASK_DEFINITION_ARN is empty. Please set the Task Definition ARN."
                 exit 1
             fi
-        else
+          else
             echo "Creating ECS service with ALB..."
             
             # ECS Create Service if the above condition is false
@@ -133,15 +133,11 @@ jobs:
               --health-check-grace-period-seconds 60   # Optional, ensure grace period on health check for slow start
         
             # The creation command ensures the new service is provisioned and associated with the load balancer (ALB).
-        fi
-      
-      
+          fi
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           AWS_REGION: ap-south-1
-
-
 
       # Step 10: Verify Target Registration in ALB Target Group
       - name: Verify Targets in ALB Target Group
