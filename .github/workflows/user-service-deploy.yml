@@ -40,7 +40,7 @@ jobs:
         run: |
           aws ecs register-task-definition \
             --family user-service \
-            --container-definitions file://./user-service/task-def.json \
+            --container-definitions "file://./user-service/task-def.json" \
             --region ap-south-1
 
       - name: Create ECS Service (if not already created)
