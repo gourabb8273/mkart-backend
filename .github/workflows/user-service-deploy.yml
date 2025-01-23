@@ -1,0 +1,45 @@
+name: Deploy User Service
+
+on:
+  push:
+    paths:
+      - "user-service/**" # Trigger pipeline on changes in the user-service folder
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      # Step 1: Checkout Code
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      # Step 2: Set Up Docker
+      - name: Set Up Docker
+        uses: docker/setup-buildx-action@v2
+
+      # Step 3: Log in to Amazon ECR
+      - name: Log in to Amazon ECR
+        id: ecr-login
+        uses: aws-actions/amazon-ecr-login@v1
+
+      # Step 4: Build and Push Docker Image
+      - name: Build and Push User Service Image
+        run: |
+          IMAGE_TAG="${{ secrets.ECR_URI }}/user-service:${{ github.sha }}"
+          docker build -t $IMAGE_TAG ./user-service
+          docker push $IMAGE_TAG
+          echo "IMAGE_TAG=$IMAGE_TAG" >> $GITHUB_ENV
+
+      # Step 5: Update Task Definition File Dynamically
+      - name: Update Task Definition
+        run: |
+          sed -i 's#<IMAGE_URI>#${{ env.IMAGE_TAG }}#g' ./user-service/task-def.json
+
+      # Step 6: Deploy to ECS
+      - name: Deploy to ECS
+        uses: aws-actions/amazon-ecs-deploy-task-definition@v1
+        with:
+          task-definition: ./user-service/task-def.json
+          service: user-service
+          cluster: my-microservices
+          wait-for-service-stability: true
