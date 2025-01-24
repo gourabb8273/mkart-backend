@@ -1,0 +1,31 @@
+{
+  "family": "order-service",
+  "containerDefinitions": [
+    {
+      "name": "order-service",
+      "image": "<IMAGE_URI>",
+      "cpu": 512,
+      "memory": 512,
+      "essential": true,
+      "portMappings": [
+        {
+          "containerPort": 3000,
+          "hostPort": 3002,
+          "protocol": "tcp"
+        }
+      ],
+      "logConfiguration": {
+        "logDriver": "awslogs",
+        "options": {
+          "awslogs-group": "/ecs/order-service",
+          "awslogs-region": "ap-south-1",
+          "awslogs-stream-prefix": "order-service"
+        }
+      }
+    }
+  ],
+  "networkMode": "bridge",
+  "requiresCompatibilities": ["EC2"],
+  "executionRoleArn": "arn:aws:iam::980921736494:role/ecsTaskExecutionRole",
+  "taskRoleArn": "arn:aws:iam::980921736494:role/ecsTaskExecutionRole"
+}
