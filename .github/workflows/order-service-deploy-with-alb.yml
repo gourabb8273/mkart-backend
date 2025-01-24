@@ -131,3 +131,15 @@ jobs:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           AWS_REGION: ${{ secrets.REGION }}
+
+      #  Flush API gateway Cache
+      - name: Flush API gateway Cache
+        run: |
+          aws apigateway flush-stage-cache \
+            --rest-api-id wc5wr9px90 \
+            --stage-name dev
+
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: ${{ secrets.REGION }}
