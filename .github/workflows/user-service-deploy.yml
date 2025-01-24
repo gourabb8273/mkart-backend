@@ -3,7 +3,7 @@ name: Deploy User Service
 on:
   push:
     paths:
-      - "user-service/**"   # Triggered only when user-service code changes
+      - "user-service1/**"   # Triggered only when user-service code changes
 
 jobs:
   build-and-deploy:
