@@ -98,7 +98,7 @@ jobs:
               --load-balancers '[{
                 "targetGroupArn": "arn:aws:elasticloadbalancing:ap-south-1:980921736494:targetgroup/ecs-order-service-tg/3a1b2a47742b26cd",
                 "containerName": "order-service",
-                "containerPort": 3000
+                "containerPort": 3002
               }]' \
               --region ap-south-1 \
               --health-check-grace-period-seconds 60
