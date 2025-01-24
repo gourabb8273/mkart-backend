@@ -3,7 +3,7 @@ name: Deploy Order Service
 on:
   push:
     paths:
-      - "order-service/**"   # Triggered only when user-service code changes
+      - "order-service1/**"   # Triggered only when user-service code changes
 
 jobs:
   build-and-deploy:
