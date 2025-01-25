@@ -27,5 +27,15 @@
     "gender": "Male",
     "email": "testuser1245@example.com",
     "password": "$2a$10$xYUBTeWOqUlmXH8CZ/HV6ecyeU6JHPJqjF23JWMhDxBIUn7UWth4u"
+  },
+  {
+    "gender": "Male",
+    "email": "testuser1s245@example.com",
+    "password": "$2a$10$swVNNYPVmMnjuAezOrotm.j4cOVTrhXqSJTxYiTQovgzmGFhbkhWC"
+  },
+  {
+    "gender": "Male",
+    "email": "testuser1ss245@example.com",
+    "password": "$2a$10$PwN5qWDUo2rbKfRSNZFAe.qVwqRBGb3pW/lUyQZUB4Irwx.J2WaGm"
   }
 ]

@@ -1,5 +1,6 @@
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const { getSecretValue } = require('./getSecret');
 const { getUserByEmail, saveUser } = require('../utils/localFileStore');
 
 // Register user service
@@ -22,9 +23,12 @@ const registerUser = async ({ gender, email, password, mobileNumber }) => {
   // Save the user to the local file
   saveUser(newUser);
   // Generate JWT token
+  const jwtSecret = await getSecretValue("JWT_SECRET");
+  console.log("jwtSecret",jwtSecret)
+
   const token = jwt.sign(
     { userId: newUser.id, email: newUser.email },
-    process.env.JWT_SECRET , // You should keep this in the .env file
+    jwtSecret|| process.env.JWT_SECRET , // You should keep this in the .env file
     { expiresIn: '1h' }
   );
   return {...newUser,token};
@@ -44,7 +48,9 @@ const loginUser = async (email, password) => {
     throw new Error('Invalid credentials!');
   }
 
-  const token = jwt.sign({ userId: user.email }, process.env.JWT_SECRET , { expiresIn: '1h' });
+  const jwtSecret = await getSecretValue("JWT_SECRET");
+  console.log("jwtSecret",jwtSecret)
+  const token = jwt.sign({ userId: user.email }, jwtSecret|| process.env.JWT_SECRET , { expiresIn: '1h' });
   
   return token;
 };
