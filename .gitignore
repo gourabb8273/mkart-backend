@@ -22,3 +22,6 @@ Thumbs.db
 
 # Build artifacts
 /dist
+
+# Optionally, if there’s a common node_modules folder in root (for monorepos)
+/node_modules/
