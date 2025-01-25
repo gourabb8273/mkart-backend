@@ -21,7 +21,18 @@
           "awslogs-region": "ap-south-1",
           "awslogs-stream-prefix": "user-service"
         }
-      }
+      },
+      "secrets": [
+        {
+          "name": "JWT_SECRET",
+          "valueFrom": "arn:aws:secretsmanager:ap-south-1:980921736494:secret:JWT_SECRET-5AXt1a"
+        },
+        {
+          "name": "SESSION_SECRET",
+          "valueFrom": "arn:aws:secretsmanager:ap-south-1:980921736494:secret:SESSION_SECRET-fXj26a"
+        }
+      ]
+
     }
   ],
   "networkMode": "bridge",
