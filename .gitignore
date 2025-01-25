@@ -1,0 +1,24 @@
+# Ignore node_modules in user-service
+/user-service/node_modules/
+
+# Ignore node_modules in order-service
+/order-service/node_modules/
+
+# Ignore logs
+logs
+*.log
+npm-debug.log*
+
+# OS-specific files
+.DS_Store
+Thumbs.db
+
+# Environment files
+.env
+
+# IDE configurations
+.vscode/
+.idea/
+
+# Build artifacts
+/dist
