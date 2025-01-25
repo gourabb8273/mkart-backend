@@ -22,7 +22,12 @@ app.use(session({
 }));
 
 // Mount Routes
-app.use('/api/users', userRoutes);
+app.use('/api', userRoutes);
+
+app.get('/', (req, res) => {
+  res.send('Welcome to the User Service!');
+});
+
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
