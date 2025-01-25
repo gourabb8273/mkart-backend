@@ -1,20 +1,23 @@
-# Use an official lightweight Node.js image
-FROM node:16-alpine
+# Step 1: Use the official Node.js image from DockerHub
+FROM node:16
 
-# Set working directory
-WORKDIR /usr/src/app
+# Step 2: Set the working directory inside the container
+WORKDIR /app
 
-# Copy package.json and package-lock.json (if available)
+# Step 3: Copy the package.json and package-lock.json files into the working directory
 COPY package*.json ./
 
-# Install dependencies
+# Step 4: Install the dependencies
 RUN npm install
 
-# Copy application code to the container
+# Step 5: Copy the rest of the application files into the container
 COPY . .
 
-# Expose port
+# Step 6: Expose port 5000 (change if your app listens on a different port)
 EXPOSE 3000
 
-# Command to run your application
-CMD ["node", "index.js"]
+# Step 7: Set the environment variable for NODE_ENV to "production"
+ENV NODE_ENV=production
+
+# Step 8: Run the app using the command to start the server
+CMD ["node", "src/server.js"]

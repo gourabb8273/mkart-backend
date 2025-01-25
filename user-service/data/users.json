@@ -1,0 +1,31 @@
+[
+  {
+    "id": "1",
+    "gender": "Male",
+    "email": "johndoe@example.com",
+    "password": "$2a$10$zGJCHhxhs5uJb2SEqF3qI.BZ8mQhxOJZmZb9jltn.eTy9zCHQvnqG",
+    "mobile": "1234567890"
+  },
+  {
+    "id": "2",
+    "gender": "Female",
+    "email": "janedoe@example.com",
+    "password": "$2a$10$0LlS/KVi7YWddK7WY.GPLptOXPfNzBeBFHtdYxa/lsNgzIlk.IEgO",
+    "mobile": "0987654321"
+  },
+  {
+    "gender": "Male",
+    "email": "testuser@example.com",
+    "password": "$2a$10$GAU4jwWJ46LcQe7sWf1Fje0hJlNSYOayh9to4Bm2Nn2/xexFtJpDK"
+  },
+  {
+    "gender": "Male",
+    "email": "testuser12345@example.com",
+    "password": "$2a$10$D6ZNIUQCpwK0HZ3cw8jFxuxkROm7WjYJevEcVKzUNYeSniJaHyJQu"
+  },
+  {
+    "gender": "Male",
+    "email": "testuser1245@example.com",
+    "password": "$2a$10$xYUBTeWOqUlmXH8CZ/HV6ecyeU6JHPJqjF23JWMhDxBIUn7UWth4u"
+  }
+]
