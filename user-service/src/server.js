@@ -1,6 +1,8 @@
 const express = require('express');
 const session = require('express-session');
 const dotenv = require('dotenv');
+const { auth } = require('express-openid-connect');
+
 const userRoutes = require('./routes/userRoutes');
 
 // Load environment variables
@@ -13,6 +15,17 @@ console.log(process.env.PORT);
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+// app.use(
+//   auth({
+//     issuerBaseURL: process.env.AUTH0_ISSUER_BASE_URL,
+//     baseURL: process.env.BASE_URL,
+//     clientID: process.env.AUTH0_CLIENT_ID,
+//     secret: process.env.SESSION_SECRET,
+//     authRequired: false,
+//     auth0Logout: true,
+//   }),
+// );
+
 // Session Configuration
 app.use(session({
   secret: process.env.SESSION_SECRET ,
@@ -22,7 +35,7 @@ app.use(session({
 }));
 
 // Mount Routes
-app.use('/api', userRoutes);
+app.use('/user/api', userRoutes);
 
 app.get('/user', (req, res) => {
   res.send('Welcome to the User Service!');
