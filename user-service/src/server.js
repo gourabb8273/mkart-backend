@@ -24,7 +24,7 @@ app.use(session({
 // Mount Routes
 app.use('/api', userRoutes);
 
-app.get('/', (req, res) => {
+app.get('/user', (req, res) => {
   res.send('Welcome to the User Service!');
 });
 
