@@ -1,58 +1,65 @@
-const bcrypt = require('bcryptjs');
-const jwt = require('jsonwebtoken');
-const { getSecretValue } = require('./getSecret');
-const { getUserByEmail, saveUser } = require('../utils/localFileStore');
+import bcrypt from 'bcryptjs';
+import jwt from 'jsonwebtoken';
+import dotenv from 'dotenv';
+dotenv.config();
 
-// Register user service
-const registerUser = async ({ gender, email, password, mobileNumber }) => {
-  const userExists = getUserByEmail(email);
-  
-  if (userExists) {
-    throw new Error('User already exists!');
+import User from '../models/User.js';
+
+// Save (create or update) user service used on initial save
+export const saveUserService = async (userDetails) => {
+  try {
+    const { profile, auth0Id, isLoggedIn } = userDetails;
+    if (!profile || !profile.email) {
+      throw new Error('Profile and email are required');
+    }
+    const dataToSave = {
+      name: profile.name,
+      email: profile.email,
+      mobile: profile.mobile,
+      gender: profile.gender,
+      role: profile.role,
+      picture: profile.picture,
+      auth0Id,
+      lastLogginAt: new Date()
+    };
+    let user = await User.findOne({ email: profile.email });
+    if (user) {
+      user = await User.findOneAndUpdate({ email: profile.email }, dataToSave, { new: true });
+    } else {
+      user = await User.create(dataToSave);
+    }
+    return user;
+  } catch (error) {
+    console.log("failed", error);
+    throw new Error('Failed to save user: ' + error.message);
   }
-
-  const hashedPassword = await bcrypt.hash(password, 10);
-
-  const newUser = {
-    gender,
-    email,
-    password: hashedPassword,
-    mobileNumber,
-  };
-
-  // Save the user to the local file
-  saveUser(newUser);
-  // Generate JWT token
-  const jwtSecret = await getSecretValue("JWT_SECRET");
-  console.log("jwtSecret",jwtSecret)
-
-  const token = jwt.sign(
-    { userId: newUser.id, email: newUser.email },
-    jwtSecret|| process.env.JWT_SECRET , // You should keep this in the .env file
-    { expiresIn: '1h' }
-  );
-  return {...newUser,token};
 };
 
-// Login user service
-const loginUser = async (email, password) => {
-  const user = getUserByEmail(email);
-
-  if (!user) {
-    throw new Error('User not found!');
+// Update service for partial updates (PATCH)
+export const updateUserService = async (email, updates) => {
+  try {
+    if (!email) {
+      throw new Error('Email is required for update');
+    }
+    const updatedUser = await User.findOneAndUpdate(
+      { email },
+      { ...updates, lastLogginAt: new Date() },
+      { new: true }
+    );
+    return updatedUser;
+  } catch (error) {
+    throw new Error('Failed to update user: ' + error.message);
   }
-
-  const isMatch = await bcrypt.compare(password, user.password);
-
-  if (!isMatch) {
-    throw new Error('Invalid credentials!');
-  }
-
-  const jwtSecret = await getSecretValue("JWT_SECRET");
-  console.log("jwtSecret",jwtSecret)
-  const token = jwt.sign({ userId: user.email }, jwtSecret|| process.env.JWT_SECRET , { expiresIn: '1h' });
-  
-  return token;
 };
 
-module.exports = { registerUser, loginUser };
+// New service function to get all users
+export const getAllUsersService = async () => {
+  try {
+    const users = await User.find({});
+    return users;
+  } catch (error) {
+    throw new Error('Failed to retrieve users: ' + error.message);
+  }
+};
+
+

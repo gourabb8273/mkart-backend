@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "E-commerce application backend API for user registration, login, and comments section.",
   "main": "src/server.js",
+  "type": "module",
   "scripts": {
     "start": "node src/server.js",
     "dev": "nodemon src/server.js",
@@ -10,6 +11,7 @@
   },
   "dependencies": {
     "@aws-sdk/client-secrets-manager": "^3.734.0",
+    "auth0": "^2.25.0",
     "aws-sdk": "^2.1692.0",
     "bcryptjs": "^2.4.3",
     "dotenv": "^16.0.0",
@@ -18,8 +20,12 @@
     "express-session": "^1.17.2",
     "fs": "^0.0.1-security",
     "jsonwebtoken": "^8.5.1",
+    "mongodb": "^6.15.0",
+    "mongoose": "^8.12.2",
     "nodemon": "^2.0.22",
-    "path": "^0.12.7"
+    "path": "^0.12.7",
+    "swagger-jsdoc": "^6.2.8",
+    "swagger-ui-express": "^5.0.1"
   },
   "devDependencies": {
     "nodemon": "^2.0.22"
