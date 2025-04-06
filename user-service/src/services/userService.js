@@ -63,3 +63,12 @@ export const getAllUsersService = async () => {
 };
 
 
+
+export const getUserByIdService = async (userId) => {
+  try {
+    const user = await User.findById(userId);
+    return user;
+  } catch (error) {
+    throw new Error('Failed to retrieve user by ID: ' + error.message);
+  }
+};

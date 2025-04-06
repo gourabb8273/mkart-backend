@@ -1,5 +1,5 @@
 import express  from 'express';
-import { saveUserService, updateUserService, getAllUsersService }from '../services/userService.js';
+import { saveUserService, updateUserService, getAllUsersService, getUserByIdService }from '../services/userService.js';
 
 const router = express.Router();
 
@@ -63,13 +63,12 @@ router.post('/save', async (req, res) => {
     return res.status(500).json({ error: error.message || 'Something went wrong!' });
   }
 });
-
 /**
  * @swagger
  * /update:
  *   patch:
  *     summary: Update a user profile.
- *     description: Partially update user profile fields.
+ *     description: Partially update user profile fields, including shipping address.
  *     requestBody:
  *       required: true
  *       content:
@@ -95,6 +94,27 @@ router.post('/save', async (req, res) => {
  *               role:
  *                 type: string
  *                 example: "Admin"
+ *               shippingAddress:
+ *                 type: object
+ *                 properties:
+ *                   line1:
+ *                     type: string
+ *                     example: "456 Maple Avenue"
+ *                   line2:
+ *                     type: string
+ *                     example: "Suite 12B"
+ *                   city:
+ *                     type: string
+ *                     example: "San Francisco"
+ *                   state:
+ *                     type: string
+ *                     example: "CA"
+ *                   zip:
+ *                     type: string
+ *                     example: "94107"
+ *                   country:
+ *                     type: string
+ *                     example: "USA"
  *     responses:
  *       200:
  *         description: User updated successfully.
@@ -105,6 +125,7 @@ router.post('/save', async (req, res) => {
  *       500:
  *         description: Internal server error.
  */
+
 router.patch('/update', async (req, res) => {
   try {
     const { email, ...updates } = req.body;
@@ -120,31 +141,47 @@ router.patch('/update', async (req, res) => {
     return res.status(500).json({ error: error.message || 'Something went wrong!' });
   }
 });
-
 /**
  * @swagger
  * /:
  *   get:
- *     summary: Retrieve all users.
- *     description: Returns a list of all user profiles stored in the database.
+ *     summary: Retrieve a user by Mongo _id.
+ *     description: Returns a single user profile based on user _id.
+ *     parameters:
+ *       - in: query
+ *         name: userId
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: MongoDB _id of the user to retrieve
  *     responses:
  *       200:
- *         description: A list of users.
+ *         description: User profile retrieved successfully.
  *         content:
  *           application/json:
  *             schema:
- *               type: array
- *               items:
- *                 $ref: '#/components/schemas/User'
+ *               $ref: '#/components/schemas/User'
+ *       404:
+ *         description: User not found.
  *       500:
  *         description: Internal server error.
  */
 router.get('/', async (req, res) => {
   try {
-    const users = await getAllUsersService();
-    return res.status(200).json({ message: 'Users retrieved successfully!', data: users });
+    const { userId } = req.query;
+    if (!userId) {
+      return res.status(400).json({ error: "userId query parameter is required" });
+    }
+
+    const user = await getUserByIdService(userId); 
+
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    return res.status(200).json({ message: "User retrieved successfully!", data: user });
   } catch (error) {
-    return res.status(500).json({ error: error.message || 'Something went wrong!' });
+    return res.status(500).json({ error: error.message || "Something went wrong!" });
   }
 });
 

@@ -1,12 +1,14 @@
-const swaggerJsdoc = require('swagger-jsdoc');
+import swaggerJsdoc from 'swagger-jsdoc';
+import dotenv from 'dotenv';
+dotenv.config();
 
 const options = {
   swaggerDefinition: {
     openapi: "3.0.0",
     info: {
-      title: "Cart Service API",
+      title: "Order Service API",
       version: "1.0.0",
-      description: "API for product catelog to manage product.",
+      description: "API for user registration, login, and profile updates.",
     },
     servers: [
       {
@@ -19,4 +21,4 @@ const options = {
 };
 
 const swaggerSpec = swaggerJsdoc(options);
-module.exports = swaggerSpec;
+export default swaggerSpec;

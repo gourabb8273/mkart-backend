@@ -35,7 +35,7 @@ router.get('/', async (req, res) => {
   if (!userId) return res.status(400).json({ message: 'User ID is required' });
 
   try {
-    const cartItems = await Cart.find({ userId }); 
+    const cartItems = await Cart.find({ userId, ordered: false });
     res.status(200).json(cartItems);
   } catch (err) {
     res.status(500).json({ message: err.message });
@@ -193,6 +193,53 @@ router.delete('/', async (req, res) => {
   } catch (err) {
     console.error('Error removing cart item:', err);
     res.status(500).json({ message: 'Server error' });
+  }
+});
+
+/**
+ * @swagger
+ * /cart/markAsOrdered:
+ *   patch:
+ *     summary: Mark specific cart items as ordered
+ *     tags: [Cart]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - cartIds
+ *             properties:
+ *               cartIds:
+ *                 type: array
+ *                 items:
+ *                   type: string
+ *                 example: ["661161790c3da2cc3fdc190b", "661161a50c3da2cc3fdc1912"]
+ *     responses:
+ *       200:
+ *         description: Selected cart items marked as ordered
+ *       400:
+ *         description: Invalid request
+ *       500:
+ *         description: Server error
+ */
+router.patch('/markAsOrdered', async (req, res) => {
+  const { cartIds } = req.body;
+
+  if (!Array.isArray(cartIds) || cartIds.length === 0) {
+    return res.status(400).json({ message: 'cartIds array is required' });
+  }
+
+  try {
+    const result = await Cart.updateMany(
+      { _id: { $in: cartIds }, ordered: false },
+      { $set: { ordered: true } }
+    );
+
+    res.status(200).json({ message: 'Cart items marked as ordered', modifiedCount: result.modifiedCount });
+  } catch (err) {
+    res.status(500).json({ message: 'Failed to mark cart items as ordered', error: err.message });
   }
 });
 module.exports = router;

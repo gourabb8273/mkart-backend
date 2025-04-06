@@ -5,7 +5,7 @@ import cors from 'cors';
 import mongoose from 'mongoose';
 import swaggerUi from 'swagger-ui-express';
 import swaggerSpec from './src/config/swagger.js';
-import cartRoutes from './src/routes/cartRoutes.js';
+import orderRoutes from './src/routes/orderRoutes.js';
 
 
 const app = express();
@@ -27,7 +27,7 @@ app.get('/', (req, res) => {
   res.send('Welcome to the Order Service!');
 });
 
-app.use('/cart', cartRoutes);
+app.use('/orders', orderRoutes);
 
 // Swagger UI
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
@@ -35,6 +35,6 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 // Start server
 const PORT = process.env.PORT || 3003;
 app.listen(PORT, () => {
-  console.log(`Cart Service running on port ${PORT}`);
+  console.log(`Order Service running on port ${PORT}`);
   console.log(`Swagger docs available at http://localhost:${PORT}/api-docs`);
 });
