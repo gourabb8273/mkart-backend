@@ -113,7 +113,7 @@ jobs:
         with:
           task-definition: ./user-service/task-def.json
           service: user-service
-          cluster: my-microservices
+          cluster: ${{ secrets.CLUSTER_NAME }}
           wait-for-service-stability: true
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
