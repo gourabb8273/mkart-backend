@@ -59,7 +59,7 @@ jobs:
         id: check-service
         run: |
           SERVICE_STATUS=$(aws ecs describe-services \
-            --cluster my-microservices \
+            --cluster ${{ secrets.CLUSTER_NAME }} \
             --services user-service \
             --query 'services[0].status' \
             --output text --region ap-south-1)
@@ -81,7 +81,7 @@ jobs:
           if [ "${{ steps.check-service.outputs.service-exists }}" == "true" ]; then
             echo "Updating ECS service with ALB..."
             aws ecs update-service \
-              --cluster my-microservices \
+              --cluster ${{ secrets.CLUSTER_NAME }} \
               --service user-service \
               --task-definition user-service:1 \
               --desired-count 1 \
@@ -90,7 +90,7 @@ jobs:
           else
             echo "Creating ECS service with ALB..."
             aws ecs create-service \
-              --cluster my-microservices \
+              --cluster ${{ secrets.CLUSTER_NAME }} \
               --service-name user-service \
               --task-definition user-service:1 \
               --desired-count 1 \
