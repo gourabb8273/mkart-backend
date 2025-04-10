@@ -5,7 +5,7 @@
       "name": "user-service",
       "image": "<IMAGE_URI>",
       "cpu": 512, 
-      "memory": 512,
+      "memory": 512, 
       "essential": true,
       "portMappings": [
         {
