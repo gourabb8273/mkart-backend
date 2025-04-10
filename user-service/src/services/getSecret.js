@@ -1,7 +1,7 @@
 // getSecret.js
 
-const { SecretsManagerClient, GetSecretValueCommand } = require("@aws-sdk/client-secrets-manager");
-
+// const { SecretsManagerClient, GetSecretValueCommand } = require("@aws-sdk/client-secrets-manager");
+import { SecretsManagerClient, GetSecretValueCommand } from "@aws-sdk/client-secrets-manager";
 // Initialize the SecretsManager client
 const client = new SecretsManagerClient({ region: "ap-south-1" });
 
@@ -27,4 +27,4 @@ async function getSecretValue(secretId) {
   }
 }
 
-module.exports = { getSecretValue }; // This exports the function properly
+export default getSecretValue // This exports the function properly

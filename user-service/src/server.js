@@ -10,6 +10,18 @@ import swaggerSpec from './config/swagger.js';
 import wishlistRoutes from './routes/wishlistRoutes.js';
 
 
+
+// import {
+//   SecretsManagerClient,
+//   GetSecretValueCommand,
+// } from "@aws-sdk/client-secrets-manager";
+
+// const secret_name = "MONGO_URI";
+
+// const client = new SecretsManagerClient({
+//   region: "ap-south-1",
+// });
+
 dotenv.config();
 
 const app = express();
