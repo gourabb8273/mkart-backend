@@ -59,7 +59,7 @@ jobs:
         id: check-service
         run: |
           SERVICE_STATUS=$(aws ecs describe-services \
-            --cluster my-microservices \
+            --cluster ${{ secrets.CLUSTER_NAME }} \
             --services user-service \
             --query 'services[0].status' \
             --output text --region ap-south-1)
@@ -81,7 +81,7 @@ jobs:
           if [ "${{ steps.check-service.outputs.service-exists }}" == "true" ]; then
             echo "Updating ECS service with ALB..."
             aws ecs update-service \
-              --cluster my-microservices \
+              --cluster ${{ secrets.CLUSTER_NAME }} \
               --service user-service \
               --task-definition user-service:1 \
               --desired-count 1 \
@@ -90,13 +90,13 @@ jobs:
           else
             echo "Creating ECS service with ALB..."
             aws ecs create-service \
-              --cluster my-microservices \
+              --cluster ${{ secrets.CLUSTER_NAME }} \
               --service-name user-service \
               --task-definition user-service:1 \
               --desired-count 1 \
               --launch-type EC2 \
               --load-balancers '[{
-                "targetGroupArn": "arn:aws:elasticloadbalancing:ap-south-1:980921736494:targetgroup/ecs-tg/37c661d494e4ce68",
+                "targetGroupArn": "arn:aws:elasticloadbalancing:ap-south-1:959620655722:targetgroup/ecs-tg/432523d55f72dcde",
                 "containerName": "user-service",
                 "containerPort": 3000
               }]' \
@@ -113,7 +113,7 @@ jobs:
         with:
           task-definition: ./user-service/task-def.json
           service: user-service
-          cluster: my-microservices
+          cluster: ${{ secrets.CLUSTER_NAME }}
           wait-for-service-stability: true
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}

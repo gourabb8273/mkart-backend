@@ -3,16 +3,16 @@
   "containerDefinitions": [
     {
       "name": "user-service",
-      "image": "<IMAGE_URI>",
-      "cpu": 512,
-      "memory": 512,
+      "image": "<IMAGE_URI>", 
+      "cpu": 512, 
+      "memory": 512, 
       "essential": true,
       "portMappings": [
-        {
+        { 
           "containerPort": 3000,
           "hostPort": 3002,
           "protocol": "tcp"
-        }
+        } 
       ],
       "logConfiguration": {
         "logDriver": "awslogs",
@@ -24,12 +24,8 @@
       },
       "secrets": [
         {
-          "name": "JWT_SECRET",
-          "valueFrom": "arn:aws:secretsmanager:ap-south-1:980921736494:secret:JWT_SECRET-5AXt1a"
-        },
-        {
-          "name": "SESSION_SECRET",
-          "valueFrom": "arn:aws:secretsmanager:ap-south-1:980921736494:secret:SESSION_SECRET-fXj26a"
+          "name": "MONGO_URI",
+          "valueFrom": "arn:aws:secretsmanager:ap-south-1:959620655722:secret:MONGO_URI-SXIeDd"
         }
       ]
 
@@ -37,6 +33,6 @@
   ],
   "networkMode": "bridge",
   "requiresCompatibilities": ["EC2"],
-  "executionRoleArn": "arn:aws:iam::980921736494:role/ecsTaskExecutionRole",
-  "taskRoleArn": "arn:aws:iam::980921736494:role/ecsTaskExecutionRole"
+  "executionRoleArn": "arn:aws:iam::959620655722:role/ecsTaskExecutionRole",
+  "taskRoleArn": "arn:aws:iam::959620655722:role/ecsTaskExecutionRole"
 }
