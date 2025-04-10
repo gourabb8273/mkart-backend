@@ -8,7 +8,7 @@
       "memory": 512, 
       "essential": true,
       "portMappings": [
-        {
+        { 
           "containerPort": 3000,
           "hostPort": 3002,
           "protocol": "tcp"
