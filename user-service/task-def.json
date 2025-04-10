@@ -3,7 +3,7 @@
   "containerDefinitions": [
     {
       "name": "user-service",
-      "image": "<IMAGE_URI>",
+      "image": "<IMAGE_URI>", 
       "cpu": 512, 
       "memory": 512, 
       "essential": true,
