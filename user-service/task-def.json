@@ -12,7 +12,7 @@
           "containerPort": 3000,
           "hostPort": 3002,
           "protocol": "tcp"
-        }
+        } 
       ],
       "logConfiguration": {
         "logDriver": "awslogs",
