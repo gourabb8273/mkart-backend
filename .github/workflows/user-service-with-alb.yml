@@ -39,7 +39,7 @@ jobs:
       - name: Attach CloudWatch Logs Permissions to Task Execution Role
         run: |
           aws iam attach-role-policy \
-            --role-name ecsTaskExecutionRole \
+            --role-name ecsInstanceRole \
             --policy-arn arn:aws:iam::aws:policy/CloudWatchLogsFullAccess
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
