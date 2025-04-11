@@ -1,0 +1,39 @@
+{
+    "family": "product-service",
+    "containerDefinitions": [
+      {
+        "name": "product-service",
+        "image": "<IMAGE_URI>", 
+        "cpu": 512, 
+        "memory": 512, 
+        "essential": true,
+        "portMappings": [
+          { 
+            "containerPort": 3001,
+            "hostPort": 3003,
+            "protocol": "tcp"
+          } 
+        ],
+        "logConfiguration": {
+          "logDriver": "awslogs",
+          "options": {
+            "awslogs-group": "/ecs/product-service",
+            "awslogs-region": "ap-south-1", 
+            "awslogs-stream-prefix": "product-service"
+          }
+        },
+        "secrets": [
+          {
+            "name": "MONGO_URI",
+            "valueFrom": "arn:aws:secretsmanager:ap-south-1:959620655722:secret:MONGO_URI-SXIeDd"
+          }
+        ]
+  
+      }
+    ],
+    "networkMode": "bridge",
+    "requiresCompatibilities": ["EC2"],
+    "executionRoleArn": "arn:aws:iam::959620655722:role/ecsTaskExecutionRole",
+    "taskRoleArn": "arn:aws:iam::959620655722:role/ecsTaskExecutionRole"
+  }
+  

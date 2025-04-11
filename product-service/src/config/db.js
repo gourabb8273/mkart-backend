@@ -1,23 +1,26 @@
-const mongoose = require('mongoose');
-require('dotenv').config();
+import mongoose from 'mongoose';
+import dotenv from 'dotenv';
+import getSecret from '../services/getSecret.js';
 
-const uri = process.env.MONGO_URI;
-if (!uri) {
-  console.error("Missing MONGO_URI in environment variables");
-  process.exit(1);
-}
+dotenv.config();
 
 const connectDB = async () => {
   try {
-    await mongoose.connect(uri, {
+    const uri = await getSecret('MONGO_URI');
+   
+    const dbName = 'product-catelog'; 
+    const fullUri = `${uriBase}/${dbName}?retryWrites=true&w=majority`;
+    console.log('[MongoDB] Connecting to:', fullUri);
+    await mongoose.connect(fullUri, {
       useNewUrlParser: true,
       useUnifiedTopology: true,
     });
-    console.log(`MongoDB connected: ${mongoose.connection.host}`);
+
+    console.log(`[MongoDB] Connected successfully to host: ${mongoose.connection.host}`);
   } catch (error) {
-    console.error("Error connecting to MongoDB:", error.message);
+    console.error('[MongoDB] Error connecting to MongoDB:', error.message);
     process.exit(1);
   }
 };
 
-module.exports = connectDB;
+export default connectDB;

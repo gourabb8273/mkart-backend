@@ -7,9 +7,11 @@ dotenv.config();
 const connectDB = async () => {
   try {
     const uri = await getSecret('MONGO_URI');
-    console.log('[MongoDB] Connecting to:', uri);
-
-    await mongoose.connect(uri, {
+   
+    const dbName = 'user-management'; 
+    const fullUri = `${uriBase}/${dbName}?retryWrites=true&w=majority`;
+    console.log('[MongoDB] Connecting to:', fullUri);
+    await mongoose.connect(fullUri, {
       useNewUrlParser: true,
       useUnifiedTopology: true,
     });

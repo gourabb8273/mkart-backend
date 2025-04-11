@@ -14,7 +14,7 @@ RUN npm install
 COPY . .
 
 # Step 6: Expose port 5000 (change if your app listens on a different port)
-EXPOSE 3000
+EXPOSE 3001
 
 # Step 7: Set the environment variable for NODE_ENV to "production"
 ENV NODE_ENV=production
