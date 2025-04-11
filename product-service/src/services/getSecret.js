@@ -1,5 +1,9 @@
-import { SecretsManagerClient, GetSecretValueCommand } from '@aws-sdk/client-secrets-manager';
-import dotenv from 'dotenv';
+// import { SecretsManagerClient, GetSecretValueCommand } from '@aws-sdk/client-secrets-manager';
+// import dotenv from 'dotenv';
+
+// dotenv.config();
+const { SecretsManagerClient, GetSecretValueCommand } = require('@aws-sdk/client-secrets-manager');
+const dotenv = require('dotenv');
 
 dotenv.config();
 
@@ -63,4 +67,5 @@ const getSecret = async (key) => {
   }
 };
 
-export default getSecret;
+// export default getSecret;
+module.exports = getSecret;
