@@ -1,6 +1,12 @@
-import mongoose from 'mongoose';
-import dotenv from 'dotenv';
-import getSecret from '../services/getSecret.js';
+// import mongoose from 'mongoose';
+// import dotenv from 'dotenv';
+// import getSecret from '../services/getSecret.js';
+
+const mongoose = require('mongoose');
+const dotenv = require('dotenv');
+const getSecret = require('../services/getSecret');
+
+dotenv.config();
 
 dotenv.config();
 
