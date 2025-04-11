@@ -96,7 +96,7 @@ jobs:
               --desired-count 1 \
               --launch-type EC2 \
               --load-balancers '[{
-                "targetGroupArn": "arn:aws:elasticloadbalancing:ap-south-1:959620655722:targetgroup/ecs-tg/432523d55f72dcde",
+                "targetGroupArn": "arn:aws:elasticloadbalancing:ap-south-1:959620655722:targetgroup/user-service-tg/84b6316ad847ce7e",
                 "containerName": "user-service",
                 "containerPort": 3000
               }]' \
