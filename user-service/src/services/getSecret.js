@@ -23,19 +23,21 @@ async function getSecret(key) {
         })
       );
 
-      let raw = response.SecretString;
+      const raw = response.SecretString;
 
-      // Try parsing as JSON
+      // If JSON, parse and return the key
       try {
         const parsed = JSON.parse(raw);
         if (parsed[key]) return parsed[key];
-      } catch {
-        // Not JSON, try to parse key=value string
-        const match = raw.match(new RegExp(`${key}=([^\\n]+)`));
-        if (match) return match[1];
+      } catch (e) {
+        // Not JSON - maybe a raw key=value string
+        if (raw.startsWith(`${key}=`)) {
+          const value = raw.replace(`${key}=`, '').trim();
+          return value;
+        }
       }
 
-      throw new Error(`Key "${key}" not found in AWS Secret`);
+      throw new Error(`Key "${key}" not found in secret string`);
 
     } catch (error) {
       console.error(`[Secret] Error fetching "${key}":`, error.message);
