@@ -33,18 +33,20 @@ connectDB();
 app.use(cors({ origin: '*' }));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-
+app.get('/user', (req, res) => {
+  res.send('Welcome to the User Service!');
+});
 // Auth0 Middleware
-app.use(
-  auth({
-    issuerBaseURL: process.env.AUTH0_ISSUER_BASE_URL,
-    baseURL: process.env.BASE_URL,
-    clientID: process.env.AUTH0_CLIENT_ID,
-    secret: process.env.SESSION_SECRET,
-    authRequired: false,
-    auth0Logout: true,
-  })
-);
+// app.use(
+//   auth({
+//     issuerBaseURL: process.env.AUTH0_ISSUER_BASE_URL,
+//     baseURL: process.env.BASE_URL,
+//     clientID: process.env.AUTH0_CLIENT_ID,
+//     secret: process.env.SESSION_SECRET,
+//     authRequired: false,
+//     auth0Logout: true,
+//   })
+// );
 
 app.get('/callback', (req, res) => {
   res.send('Authentication Callback received!');
@@ -66,9 +68,7 @@ app.use('/', userRoutes);
 // Swagger UI Setup
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
-app.get('/user', (req, res) => {
-  res.send('Welcome to the User Service!');
-});
+
 app.use("/wishlist", wishlistRoutes);
 
 const PORT = process.env.PORT || 3000;
