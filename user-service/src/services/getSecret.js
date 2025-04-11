@@ -23,21 +23,29 @@ async function getSecret(key) {
         })
       );
 
-      const raw = response.SecretString;
+      const raw = response.SecretString?.trim();
+      console.log(`[Secret] Raw string received: "${raw}"`);
 
-      // If JSON, parse and return the key
+      // Case 1: It's JSON (recommended)
       try {
         const parsed = JSON.parse(raw);
-        if (parsed[key]) return parsed[key];
-      } catch (e) {
-        // Not JSON - maybe a raw key=value string
-        if (raw.startsWith(`${key}=`)) {
-          const value = raw.replace(`${key}=`, '').trim();
+        const value = parsed[key];
+        if (value) {
+          console.log(`[Secret] Parsed JSON value for "${key}": "${value}"`);
           return value;
         }
+      } catch (e) {
+        // not JSON
       }
 
-      throw new Error(`Key "${key}" not found in secret string`);
+      // Case 2: It's a raw key=value string like "MONGO_URI=mongodb+srv://..."
+      if (raw.startsWith(`${key}=`)) {
+        const value = raw.slice(key.length + 1).trim();
+        console.log(`[Secret] Parsed raw string value for "${key}": "${value}"`);
+        return value;
+      }
+
+      throw new Error(`Could not extract key "${key}" from Secrets Manager value.`);
 
     } catch (error) {
       console.error(`[Secret] Error fetching "${key}":`, error.message);
