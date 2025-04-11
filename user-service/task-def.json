@@ -26,6 +26,10 @@
         {
           "name": "MONGO_URI",
           "valueFrom": "arn:aws:secretsmanager:ap-south-1:959620655722:secret:MONGO_URI-SXIeDd"
+        },
+        {
+          "name": "SESSION_SECRET",
+          "valueFrom": "arn:aws:secretsmanager:ap-south-1:959620655722:secret:SESSION_SECRET-5FAunK"
         }
       ]
 
