@@ -4,38 +4,48 @@ import getSecretValue from '../services/getSecret.js';
 
 dotenv.config();
 
-// Check if running locally (no AWS environment variable present)
 const isLocal = !process.env.AWS_EXECUTION_ENV;
 
 const getMongoUri = async () => {
   if (isLocal) {
-    console.log('Using local MongoDB URI from .env');
+    console.log('[MongoDB] Environment: LOCAL');
+    console.log('[MongoDB] process.env.MONGO_URI:', process.env.MONGO_URI);
+
     if (!process.env.MONGO_URI) {
-      console.error("Missing MONGO_URI in environment variables");
+      console.error('[MongoDB] Missing MONGO_URI in .env');
       process.exit(1);
     }
+
     return process.env.MONGO_URI;
   } else {
+    console.log('[MongoDB] Environment: AWS (non-local)');
     try {
       const secretString = await getSecretValue('MONGO_URI');
+      console.log('[MongoDB] Raw secret string from Secrets Manager:', secretString);
 
-      let uri;
+      const parsedSecret = JSON.parse(secretString);
+      console.log('[MongoDB] Parsed secret object:', parsedSecret);
 
-      try {
-        const parsedSecret = JSON.parse(secretString);
-        uri = parsedSecret.MONGO_URI;
-      } catch {
-        // Assume secret is a raw URI string
-        uri = secretString;
+      let uri = parsedSecret.MONGO_URI;
+
+      if (!uri) {
+        throw new Error('MONGO_URI key not found in Secrets Manager response');
       }
 
-      if (!uri || (!uri.startsWith('mongodb://') && !uri.startsWith('mongodb+srv://'))) {
-        throw new Error("Invalid MongoDB URI format from Secrets Manager");
+      if (uri.startsWith('MONGO_URI=')) {
+        console.warn('[MongoDB] MONGO_URI contains prefix "MONGO_URI=", stripping it...');
+        uri = uri.replace(/^MONGO_URI=/, '');
+      }
+
+      console.log('[MongoDB] Final MongoDB URI:', uri);
+
+      if (!uri.startsWith('mongodb://') && !uri.startsWith('mongodb+srv://')) {
+        throw new Error('Invalid MongoDB URI format from Secrets Manager');
       }
 
       return uri;
     } catch (error) {
-      console.error("Error fetching MongoDB URI from Secrets Manager:", error.message);
+      console.error('[MongoDB] Error fetching MongoDB URI from Secrets Manager:', error.message);
       process.exit(1);
     }
   }
@@ -43,15 +53,17 @@ const getMongoUri = async () => {
 
 const connectDB = async () => {
   try {
-    mongoose.set('strictQuery', false); // Optional but prevents deprecation warning
     const uri = await getMongoUri();
+    console.log('[MongoDB] Connecting to:', uri);
+
     await mongoose.connect(uri, {
       useNewUrlParser: true,
       useUnifiedTopology: true,
     });
-    console.log(`MongoDB connected: ${mongoose.connection.host}`);
+
+    console.log(`[MongoDB] Connected successfully to host: ${mongoose.connection.host}`);
   } catch (error) {
-    console.error("Error connecting to MongoDB:", error.message);
+    console.error('[MongoDB] Error connecting to MongoDB:', error.message);
     process.exit(1);
   }
 };
