@@ -1,9 +1,9 @@
-name: Deploy User Service
+name: Deploy Product Service
  
 on:
   push:
     paths:
-      - "user-service/**"   # Triggered only when user-service code changes
+      - "product-service/**"   # Triggered only when product-service code changes
  
 jobs:
   build-and-deploy:
@@ -28,13 +28,13 @@ jobs:
  
       - name: Build and Push User Service Image
         run: |
-          IMAGE_URI="${{ secrets.ECR_URI }}/user-service:latest"
-          docker build -t $IMAGE_URI ./user-service
+          IMAGE_URI="${{ secrets.ECR_URI }}/product-service:latest"
+          docker build -t $IMAGE_URI ./product-service
           docker push $IMAGE_URI
  
       - name: Update Task Definition
         run: |
-          sed -i 's#<IMAGE_URI>#${{ secrets.ECR_URI }}/user-service:latest#g' ./user-service/task-def.json
+          sed -i 's#<IMAGE_URI>#${{ secrets.ECR_URI }}/product-service:latest#g' ./product-service/task-def.json
  
       - name: Attach CloudWatch Logs Permissions to Task Execution Role
         run: |
@@ -48,7 +48,7 @@ jobs:
       - name: Register Task Definition
         run: |
           aws ecs register-task-definition \
-            --cli-input-json file://./user-service/task-def.json \
+            --cli-input-json file://./product-service/task-def.json \
             --region ap-south-1
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
@@ -60,7 +60,7 @@ jobs:
         run: |
           SERVICE_STATUS=$(aws ecs describe-services \
             --cluster ${{ secrets.CLUSTER_NAME }} \
-            --services user-service \
+            --services product-service \
             --query 'services[0].status' \
             --output text --region ap-south-1)
           echo "Service Status: $SERVICE_STATUS"
@@ -82,8 +82,8 @@ jobs:
             echo "Updating ECS service with ALB..."
             aws ecs update-service \
               --cluster ${{ secrets.CLUSTER_NAME }} \
-              --service user-service \
-              --task-definition user-service:1 \
+              --service product-service \
+              --task-definition product-service:1 \
               --desired-count 1 \
               --region ap-south-1 \
               --force-new-deployment
@@ -91,14 +91,14 @@ jobs:
             echo "Creating ECS service with ALB..."
             aws ecs create-service \
               --cluster ${{ secrets.CLUSTER_NAME }} \
-              --service-name user-service \
-              --task-definition user-service:1 \
+              --service-name product-service \
+              --task-definition product-service:1 \
               --desired-count 1 \
               --launch-type EC2 \
               --load-balancers '[{
-                "targetGroupArn": "arn:aws:elasticloadbalancing:ap-south-1:959620655722:targetgroup/user-service-tg/84b6316ad847ce7e",
-                "containerName": "user-service",
-                "containerPort": 3000
+                "targetGroupArn": "arn:aws:elasticloadbalancing:ap-south-1:959620655722:targetgroup/product-service-tg/5c46c35744209c09",
+                "containerName": "product-service",
+                "containerPort": 3001
               }]' \
               --region ap-south-1 \
               --health-check-grace-period-seconds 60
@@ -111,8 +111,8 @@ jobs:
       - name: Deploy to ECS
         uses: aws-actions/amazon-ecs-deploy-task-definition@v1
         with:
-          task-definition: ./user-service/task-def.json
-          service: user-service
+          task-definition: ./product-service/task-def.json
+          service: product-service
           cluster: ${{ secrets.CLUSTER_NAME }}
           wait-for-service-stability: true
         env:
