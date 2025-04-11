@@ -12,7 +12,7 @@ RUN npm install
 
 # Step 5: Copy the rest of the application files into the container
 COPY . . 
-
+ 
 # Step 6: Expose port 5000 (change if your app listens on a different port)
 EXPOSE 3000
 
