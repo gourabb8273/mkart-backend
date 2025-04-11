@@ -15,19 +15,15 @@ const getSecret = async (key) => {
       process.exit(1);
     }
 
-    console.log(`[Secret] Found local value for "${key}": "${value}"`);
     return value;
   }
 
   console.log(`[Secret] PROD: Fetching "${key}" from AWS Secrets Manager`);
 
-  const client = new SecretsManagerClient({ region: process.env.AWS_REGION || 'us-east-1' });
+  // 🔥 Secret name = same as key
+  const secretName = key;
 
-  const secretName = process.env.SECRET_NAME;
-  if (!secretName) {
-    console.error(`[Secret] Missing SECRET_NAME in environment`);
-    process.exit(1);
-  }
+  const client = new SecretsManagerClient({ region: process.env.AWS_REGION || 'ap-south-1' });
 
   try {
     const data = await client.send(
@@ -39,26 +35,30 @@ const getSecret = async (key) => {
     }
 
     const raw = data.SecretString;
-    console.log(`[Secret] Raw string received: ${raw}`);
+    console.log(`[Secret] Raw string received for "${key}": ${raw}`);
 
-    const parsed = JSON.parse(raw);
-    let value = parsed[key];
+    let value = raw;
 
-    if (!value) {
-      console.error(`[Secret] Key "${key}" not found in Secrets Manager value`);
-      process.exit(1);
+    // If it's JSON like `{ "SESSION_SECRET": "xxx" }`, extract the value
+    try {
+      const parsed = JSON.parse(raw);
+      if (parsed[key]) {
+        value = parsed[key];
+        console.log(`[Secret] Parsed JSON key "${key}" value: ${value}`);
+      }
+    } catch {
+      console.log(`[Secret] Secret for "${key}" is plain string`);
     }
 
+    // Strip "KEY=" prefix if present
     if (value.startsWith(`${key}=`)) {
-      console.warn(`[Secret] Value for "${key}" contains "${key}=" prefix, stripping it...`);
       value = value.slice(key.length + 1).trim();
+      console.warn(`[Secret] Stripped "${key}=" prefix. New value: ${value}`);
     }
-
-    console.log(`[Secret] Parsed JSON value for "${key}": "${value}"`);
 
     return value;
   } catch (err) {
-    console.error(`[Secret] Error fetching "${key}" from Secrets Manager:`, err.message);
+    console.error(`[Secret] Error fetching secret "${key}":`, err.message);
     process.exit(1);
   }
 };
