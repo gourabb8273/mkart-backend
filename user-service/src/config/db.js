@@ -4,7 +4,7 @@ import getSecretValue from '../services/getSecret.js';
 
 dotenv.config();
 
-//This is the correct check — works for ECS, Lambda, etc.
+// Check if running locally (no AWS environment variable present)
 const isLocal = !process.env.AWS_EXECUTION_ENV;
 
 const getMongoUri = async () => {
@@ -18,8 +18,16 @@ const getMongoUri = async () => {
   } else {
     try {
       const secretString = await getSecretValue('MONGO_URI');
-      const parsedSecret = JSON.parse(secretString);
-      const uri = parsedSecret.MONGO_URI;
+
+      let uri;
+
+      try {
+        const parsedSecret = JSON.parse(secretString);
+        uri = parsedSecret.MONGO_URI;
+      } catch {
+        // Assume secret is a raw URI string
+        uri = secretString;
+      }
 
       if (!uri || (!uri.startsWith('mongodb://') && !uri.startsWith('mongodb+srv://'))) {
         throw new Error("Invalid MongoDB URI format from Secrets Manager");
@@ -35,6 +43,7 @@ const getMongoUri = async () => {
 
 const connectDB = async () => {
   try {
+    mongoose.set('strictQuery', false); // Optional but prevents deprecation warning
     const uri = await getMongoUri();
     await mongoose.connect(uri, {
       useNewUrlParser: true,
