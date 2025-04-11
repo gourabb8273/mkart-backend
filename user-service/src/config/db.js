@@ -1,41 +1,41 @@
 import mongoose from 'mongoose';
 import dotenv from 'dotenv';
 import getSecretValue from '../services/getSecret.js';
+
 dotenv.config();
 
-const isLocal = process.env.NODE_ENV === 'development' || !process.env.AWS_ACCESS_KEY_ID;
-// const uri = process.env.MONGO_URI;
-// if (!uri) {
-//   console.error("Missing MONGO_URI in environment variables");
-//   process.exit(1);
-// }
-
+//This is the correct check — works for ECS, Lambda, etc.
+const isLocal = !process.env.AWS_EXECUTION_ENV;
 
 const getMongoUri = async () => {
   if (isLocal) {
-    // If local, fallback to the .env value
     console.log('Using local MongoDB URI from .env');
-    return process.env.MONGO_URI; // Fallback to .env
+    if (!process.env.MONGO_URI) {
+      console.error("Missing MONGO_URI in environment variables");
+      process.exit(1);
+    }
+    return process.env.MONGO_URI;
   } else {
-    // If not local, fetch the MongoDB URI from AWS Secrets Manager
     try {
       const secretString = await getSecretValue('MONGO_URI');
-      if (secretString) {
-        return JSON.parse(secretString).MONGO_URI; // Assume the secret is a JSON object with the key 'MONGO_URI'
-      } else {
-        throw new Error("Secret not found.");
+      const parsedSecret = JSON.parse(secretString);
+      const uri = parsedSecret.MONGO_URI;
+
+      if (!uri || (!uri.startsWith('mongodb://') && !uri.startsWith('mongodb+srv://'))) {
+        throw new Error("Invalid MongoDB URI format from Secrets Manager");
       }
+
+      return uri;
     } catch (error) {
-      console.error("Error fetching MongoDB URI from Secrets Manager:", error);
+      console.error("Error fetching MongoDB URI from Secrets Manager:", error.message);
       process.exit(1);
     }
   }
 };
 
-
 const connectDB = async () => {
   try {
-    const uri = await getMongoUri(); 
+    const uri = await getMongoUri();
     await mongoose.connect(uri, {
       useNewUrlParser: true,
       useUnifiedTopology: true,
