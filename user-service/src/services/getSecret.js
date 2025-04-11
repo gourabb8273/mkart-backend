@@ -1,12 +1,10 @@
 import { SecretsManagerClient, GetSecretValueCommand } from '@aws-sdk/client-secrets-manager';
-import dotenv from 'dotenv';
 
-dotenv.config();
-
-const isLocal = !process.env.AWS_EXECUTION_ENV;
 const client = new SecretsManagerClient({ region: 'ap-south-1' });
 
-const getSecret = async (key) => {
+const isLocal = !process.env.AWS_EXECUTION_ENV;
+
+async function getSecret(key) {
   if (isLocal) {
     console.log(`[Secret] LOCAL: Fetching "${key}" from .env`);
     const value = process.env[key];
@@ -15,35 +13,35 @@ const getSecret = async (key) => {
       process.exit(1);
     }
     return value;
-  }
-
-  try {
+  } else {
     console.log(`[Secret] PROD: Fetching "${key}" from AWS Secrets Manager`);
-    const response = await client.send(
-      new GetSecretValueCommand({
-        SecretId: key,
-        VersionStage: 'AWSCURRENT',
-      })
-    );
-
-    if (!response.SecretString) {
-      throw new Error('Secret does not contain a valid SecretString');
-    }
-
-    // Try to parse in case it's a JSON blob (e.g., `{ "MONGO_URI": "..." }`)
     try {
-      const parsed = JSON.parse(response.SecretString);
-      if (parsed[key]) return parsed[key];
-    } catch {
-      // Not JSON? Return raw string
-      return response.SecretString;
-    }
+      const response = await client.send(
+        new GetSecretValueCommand({
+          SecretId: key,
+          VersionStage: 'AWSCURRENT',
+        })
+      );
 
-    throw new Error(`Key "${key}" not found in parsed secret`);
-  } catch (err) {
-    console.error(`[Secret] Error fetching "${key}":`, err.message);
-    process.exit(1);
+      let raw = response.SecretString;
+
+      // Try parsing as JSON
+      try {
+        const parsed = JSON.parse(raw);
+        if (parsed[key]) return parsed[key];
+      } catch {
+        // Not JSON, try to parse key=value string
+        const match = raw.match(new RegExp(`${key}=([^\\n]+)`));
+        if (match) return match[1];
+      }
+
+      throw new Error(`Key "${key}" not found in AWS Secret`);
+
+    } catch (error) {
+      console.error(`[Secret] Error fetching "${key}":`, error.message);
+      process.exit(1);
+    }
   }
-};
+}
 
 export default getSecret;
