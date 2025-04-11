@@ -7,20 +7,9 @@ import userRoutes from './routes/userRoutes.js';
 import connectDB from './config/db.js';
 import swaggerUi from 'swagger-ui-express';
 import swaggerSpec from './config/swagger.js';
+import getSecret from './services/getSecret.js';
 import wishlistRoutes from './routes/wishlistRoutes.js';
-
-
-
-// import {
-//   SecretsManagerClient,
-//   GetSecretValueCommand,
-// } from "@aws-sdk/client-secrets-manager";
-
-// const secret_name = "MONGO_URI";
-
-// const client = new SecretsManagerClient({
-//   region: "ap-south-1",
-// });
+const isLocal = !process.env.AWS_EXECUTION_ENV;
 
 dotenv.config();
 
@@ -53,26 +42,39 @@ app.get('/callback', (req, res) => {
 });
 
 // Session Configuration
-app.use(
-  session({
-    secret: process.env.SESSION_SECRET,
-    resave: false,
-    saveUninitialized: true,
-    cookie: { httpOnly: true, secure: false },
-  })
-);
+const startServer = async () => {
+  try {
+    const sessionSecret = await getSecret('SESSION_SECRET');
 
-// Mount user routes
-app.use('/', userRoutes);
+    if (!sessionSecret) {
+      console.error('[Session] SESSION_SECRET is missing');
+      process.exit(1);
+    }
 
-// Swagger UI Setup
-app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+    app.use(
+      session({
+        secret: sessionSecret,
+        resave: false,
+        saveUninitialized: true,
+        cookie: { httpOnly: true, secure: false },
+      })
+    );
 
+    // Routes
+    app.use('/', userRoutes);
+    app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+    app.use('/wishlist', wishlistRoutes);
 
-app.use("/wishlist", wishlistRoutes);
+    const PORT = process.env.PORT || 3000;
+    app.listen(PORT, () => {
+      console.log(`Server running on port ${PORT}`);
+      console.log(`Swagger docs: http://localhost:${PORT}/api-docs`);
+    });
 
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-  console.log(`Swagger docs available at http://localhost:${PORT}/api-docs`);
-});
+  } catch (err) {
+    console.error('[Server] Error starting server:', err.message);
+    process.exit(1);
+  }
+};
+
+startServer();

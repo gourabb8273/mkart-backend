@@ -1,30 +1,49 @@
-// getSecret.js
+import { SecretsManagerClient, GetSecretValueCommand } from '@aws-sdk/client-secrets-manager';
+import dotenv from 'dotenv';
 
-// const { SecretsManagerClient, GetSecretValueCommand } = require("@aws-sdk/client-secrets-manager");
-import { SecretsManagerClient, GetSecretValueCommand } from "@aws-sdk/client-secrets-manager";
-// Initialize the SecretsManager client
-const client = new SecretsManagerClient({ region: "ap-south-1" });
+dotenv.config();
 
-// Create reusable function to get a secret from AWS Secrets Manager
-async function getSecretValue(secretId) {
+const isLocal = !process.env.AWS_EXECUTION_ENV;
+const client = new SecretsManagerClient({ region: 'ap-south-1' });
+
+const getSecret = async (key) => {
+  if (isLocal) {
+    console.log(`[Secret] LOCAL: Fetching "${key}" from .env`);
+    const value = process.env[key];
+    if (!value) {
+      console.error(`[Secret] Missing key "${key}" in .env`);
+      process.exit(1);
+    }
+    return value;
+  }
+
   try {
+    console.log(`[Secret] PROD: Fetching "${key}" from AWS Secrets Manager`);
     const response = await client.send(
       new GetSecretValueCommand({
-        SecretId: secretId,         // The secret ID passed as parameter
-        VersionStage: "AWSCURRENT", // Default to AWSCURRENT version
+        SecretId: key,
+        VersionStage: 'AWSCURRENT',
       })
     );
-    
-    // Return the secret as a string
-    if (response.SecretString) {
-      return response.SecretString;
-    } else {
-      throw new Error("Secret does not contain a valid SecretString.");
-    }
-  } catch (error) {
-    console.error("Error retrieving secret:", error);
-    throw error; // Propagate error if needed
-  }
-}
 
-export default getSecretValue // This exports the function properly
+    if (!response.SecretString) {
+      throw new Error('Secret does not contain a valid SecretString');
+    }
+
+    // Try to parse in case it's a JSON blob (e.g., `{ "MONGO_URI": "..." }`)
+    try {
+      const parsed = JSON.parse(response.SecretString);
+      if (parsed[key]) return parsed[key];
+    } catch {
+      // Not JSON? Return raw string
+      return response.SecretString;
+    }
+
+    throw new Error(`Key "${key}" not found in parsed secret`);
+  } catch (err) {
+    console.error(`[Secret] Error fetching "${key}":`, err.message);
+    process.exit(1);
+  }
+};
+
+export default getSecret;
