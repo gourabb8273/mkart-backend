@@ -22,7 +22,7 @@ connectDB();
 app.use(cors({ origin: '*' }));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.get('/user', (req, res) => {
+app.get('/', (req, res) => {
   res.send('Welcome to the User Service!');
 });
 // Auth0 Middleware
@@ -61,7 +61,7 @@ const startServer = async () => {
     );
 
     // Routes
-    app.use('/', userRoutes);
+    app.use('/user', userRoutes);
     app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
     app.use('/wishlist', wishlistRoutes);
 
