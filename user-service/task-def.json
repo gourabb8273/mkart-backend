@@ -18,7 +18,7 @@
         "logDriver": "awslogs",
         "options": {
           "awslogs-group": "/ecs/user-service",
-          "awslogs-region": "ap-south-1",
+          "awslogs-region": "ap-south-1", 
           "awslogs-stream-prefix": "user-service"
         }
       },
