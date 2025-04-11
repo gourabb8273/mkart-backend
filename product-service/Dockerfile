@@ -20,4 +20,4 @@ EXPOSE 3001
 ENV NODE_ENV=production
 
 # Step 8: Run the app using the command to start the server
-CMD ["node", "src/server.js"]
+CMD ["node", "server.js"]
