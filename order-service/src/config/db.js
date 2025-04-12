@@ -1,23 +1,23 @@
 import mongoose from 'mongoose';
 import dotenv from 'dotenv';
+import getSecret from '../services/getSecret.js';
+
 dotenv.config();
-
-
-const uri = process.env.MONGO_URI;
-if (!uri) {
-  console.error("Missing MONGO_URI in environment variables");
-  process.exit(1);
-}
 
 const connectDB = async () => {
   try {
-    await mongoose.connect(uri, {
+    const uriBase = await getSecret('MONGO_URI');
+    const dbName = 'product-order'; 
+    const fullUri = `${uriBase}/${dbName}?retryWrites=true&w=majority`;
+    console.log('[MongoDB] Connecting to:', fullUri);
+    await mongoose.connect(fullUri, {
       useNewUrlParser: true,
       useUnifiedTopology: true,
     });
-    console.log(`MongoDB connected: ${mongoose.connection.host}`);
+
+    console.log(`[MongoDB] Connected successfully to host: ${mongoose.connection.host}`);
   } catch (error) {
-    console.error("Error connecting to MongoDB:", error.message);
+    console.error('[MongoDB] Error connecting to MongoDB:', error.message);
     process.exit(1);
   }
 };

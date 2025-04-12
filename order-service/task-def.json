@@ -3,29 +3,36 @@
   "containerDefinitions": [
     {
       "name": "order-service",
-      "image": "<IMAGE_URI>",
-      "cpu": 256,
-      "memory": 256,
+      "image": "<IMAGE_URI>", 
+      "cpu": 512, 
+      "memory": 512, 
       "essential": true,
       "portMappings": [
-        {
-          "containerPort": 3002,
-          "hostPort": 3002,
+        { 
+          "containerPort": 3003,
+          "hostPort": 3004,
           "protocol": "tcp"
-        }
+        } 
       ],
       "logConfiguration": {
         "logDriver": "awslogs",
         "options": {
           "awslogs-group": "/ecs/order-service",
-          "awslogs-region": "ap-south-1",
+          "awslogs-region": "ap-south-1", 
           "awslogs-stream-prefix": "order-service"
         }
-      }
+      },
+      "secrets": [
+        {
+          "name": "MONGO_URI",
+          "valueFrom": "arn:aws:secretsmanager:ap-south-1:959620655722:secret:MONGO_URI-SXIeDd"
+        }
+      ]
+
     }
   ],
   "networkMode": "bridge",
   "requiresCompatibilities": ["EC2"],
-  "executionRoleArn": "arn:aws:iam::980921736494:role/ecsTaskExecutionRole",
-  "taskRoleArn": "arn:aws:iam::980921736494:role/ecsTaskExecutionRole"
+  "executionRoleArn": "arn:aws:iam::959620655722:role/ecsTaskExecutionRole",
+  "taskRoleArn": "arn:aws:iam::959620655722:role/ecsTaskExecutionRole"
 }

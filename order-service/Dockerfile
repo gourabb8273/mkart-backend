@@ -1,5 +1,5 @@
 # Use an official lightweight Node.js image
-FROM node:16-alpine
+FROM node:18-alpine
 
 # Set working directory
 WORKDIR /usr/src/app
@@ -14,7 +14,7 @@ RUN npm install
 COPY . .
 
 # Expose port
-EXPOSE 3002
+EXPOSE 3003
 
 # Command to run your application
-CMD ["node", "index.js"]
+CMD ["node", "server.js"]

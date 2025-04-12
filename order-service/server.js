@@ -6,8 +6,9 @@ import mongoose from 'mongoose';
 import swaggerUi from 'swagger-ui-express';
 import swaggerSpec from './src/config/swagger.js';
 import orderRoutes from './src/routes/orderRoutes.js';
+const connectDB = require('./src/config/db'); 
 
-
+connectDB();
 const app = express();
 
 app.use(cors({ origin: '*' }));
