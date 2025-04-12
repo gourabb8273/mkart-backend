@@ -12,8 +12,7 @@ dotenv.config();
 
 const connectDB = async () => {
   try {
-    const uri = await getSecret('MONGO_URI');
-   
+    const uriBase = await getSecret('MONGO_URI');
     const dbName = 'product-catelog'; 
     const fullUri = `${uriBase}/${dbName}?retryWrites=true&w=majority`;
     console.log('[MongoDB] Connecting to:', fullUri);
