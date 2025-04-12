@@ -20,7 +20,6 @@ const getSecret = async (key) => {
 
   console.log(`[Secret] PROD: Fetching "${key}" from AWS Secrets Manager`);
 
-  // 🔥 Secret name = same as key
   const secretName = key;
 
   const client = new SecretsManagerClient({ region: process.env.AWS_REGION || 'ap-south-1' });

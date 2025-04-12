@@ -1,5 +1,11 @@
 import swaggerJsdoc from 'swagger-jsdoc';
 
+const isLocal = !process.env.AWS_EXECUTION_ENV;
+
+const serverUrl = isLocal
+  ? `http://localhost:${process.env.PORT}`
+  : 'http://ecs-alb-2130983042.ap-south-1.elb.amazonaws.com/user';
+
 const options = {
   swaggerDefinition: {
     openapi: "3.0.0",
@@ -10,8 +16,8 @@ const options = {
     },
     servers: [
       {
-        url: `http://localhost:${process.env.PORT}` ,
-        description: "Local server",
+        url: serverUrl,
+        description: isLocal ? "Local server" : "Production ALB URL",
       },
     ],
   },
