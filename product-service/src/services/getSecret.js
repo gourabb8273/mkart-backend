@@ -1,7 +1,7 @@
 // import { SecretsManagerClient, GetSecretValueCommand } from '@aws-sdk/client-secrets-manager';
 // import dotenv from 'dotenv';
-
-// dotenv.config();
+ 
+// dotenv.config();.
 const { SecretsManagerClient, GetSecretValueCommand } = require('@aws-sdk/client-secrets-manager');
 const dotenv = require('dotenv');
 
