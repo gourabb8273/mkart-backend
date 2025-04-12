@@ -1,5 +1,8 @@
-import express from 'express';
-import Order from '../model/Orders.js';
+// import express from 'express';
+// import Order from '../model/Orders.js';
+const express = require('express');
+const Order = require('../model/Orders.js');
+
 
 const router = express.Router();
 /**
@@ -111,4 +114,5 @@ router.get('/', async (req, res) => {
   }
 });
 
-export default router;
+// export default router;
+module.exports = router;
