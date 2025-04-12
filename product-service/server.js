@@ -18,8 +18,8 @@ app.get('/', (req, res) => {
   res.send('Welcome to the Product Service!');
 });
 app.use('/products', productRoute);
-app.use('/inventory', inventoryRoutes);
-app.use('/reviews', reviewRoutes);
+app.use('/products/inventory', inventoryRoutes);
+app.use('/products/reviews', reviewRoutes);
 // Swagger UI Setup
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 app.get('/api/hello', (req, res) => {
