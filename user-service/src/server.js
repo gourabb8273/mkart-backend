@@ -61,9 +61,9 @@ const startServer = async () => {
     );
 
     // Routes
-    app.use('/user', userRoutes);
+    app.use('/users', userRoutes);
     app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
-    app.use('/user/wishlist', wishlistRoutes);
+    app.use('/users/wishlist', wishlistRoutes);
 
     const PORT = process.env.PORT || 3000;
     app.listen(PORT, () => {

@@ -39,7 +39,7 @@ app.get('/', (req, res) => {
   res.send('Welcome to the Cart Service!');
 });
 
-app.use('/cart', cartRoutes);
+app.use('/carts', cartRoutes);
 
 // Swagger UI
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
