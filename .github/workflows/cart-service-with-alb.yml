@@ -102,7 +102,7 @@ jobs:
               --load-balancers '[{
                 "targetGroupArn": "arn:aws:elasticloadbalancing:ap-south-1:959620655722:targetgroup/cart-service-tg/fa9058f58e61a9f2",
                 "containerName": "cart-service",
-                "containerPort": 3002
+                "containerPort": 3003
               }]' \
               --region ap-south-1 \
               --health-check-grace-period-seconds 60
