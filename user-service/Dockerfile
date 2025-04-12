@@ -1,7 +1,7 @@
 # Step 1: Use the  official Node.js image from DockerHub
 FROM node:18
 
-# Step 2:  Set  the working directory inside the container
+# Step 2: Set the working directory inside the container
 WORKDIR /app
 
 # Step 3: Copy the package.json and package-lock.json files into the working directory
