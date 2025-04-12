@@ -1,11 +1,22 @@
-import dotenv from 'dotenv';
+// import dotenv from 'dotenv';
+// dotenv.config();
+// import express from 'express';
+// import cors from 'cors';
+// import mongoose from 'mongoose';
+// import swaggerUi from 'swagger-ui-express';
+// import swaggerSpec from './src/config/swagger.js';
+// import orderRoutes from './src/routes/orderRoutes.js';
+
+const dotenv = require('dotenv');
 dotenv.config();
-import express from 'express';
-import cors from 'cors';
-import mongoose from 'mongoose';
-import swaggerUi from 'swagger-ui-express';
-import swaggerSpec from './src/config/swagger.js';
-import orderRoutes from './src/routes/orderRoutes.js';
+
+const express = require('express');
+const cors = require('cors');
+const mongoose = require('mongoose');
+const swaggerUi = require('swagger-ui-express');
+const swaggerSpec = require('./src/config/swagger.js');
+const orderRoutes = require('./src/routes/orderRoutes.js');
+
 const connectDB = require('./src/config/db'); 
 
 connectDB();

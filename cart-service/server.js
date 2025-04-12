@@ -1,11 +1,21 @@
-import dotenv from 'dotenv';
+// import dotenv from 'dotenv';
+// dotenv.config();
+// import express from 'express';
+// import cors from 'cors';
+// import mongoose from 'mongoose';
+// import swaggerUi from 'swagger-ui-express';
+// import swaggerSpec from './src/config/swagger.js';
+// import cartRoutes from './src/routes/cartRoutes.js';
+const dotenv = require('dotenv');
 dotenv.config();
-import express from 'express';
-import cors from 'cors';
-import mongoose from 'mongoose';
-import swaggerUi from 'swagger-ui-express';
-import swaggerSpec from './src/config/swagger.js';
-import cartRoutes from './src/routes/cartRoutes.js';
+
+const express = require('express');
+const cors = require('cors');
+const mongoose = require('mongoose');
+const swaggerUi = require('swagger-ui-express');
+const swaggerSpec = require('./src/config/swagger.js');
+const cartRoutes = require('./src/routes/cartRoutes.js');
+
 const connectDB = require('./src/config/db'); 
 
 connectDB();
