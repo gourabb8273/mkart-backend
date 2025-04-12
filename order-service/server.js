@@ -26,13 +26,13 @@ app.use(cors({ origin: '*' }));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-mongoose
-  .connect(process.env.MONGO_URI, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-  })
-  .then(() => console.log('MongoDB connected for Order Service'))
-  .catch((err) => console.error('MongoDB connection error:', err));
+// mongoose
+//   .connect(process.env.MONGO_URI, {
+//     useNewUrlParser: true,
+//     useUnifiedTopology: true,
+//   })
+//   .then(() => console.log('MongoDB connected for Order Service'))
+//   .catch((err) => console.error('MongoDB connection error:', err));
 
 // Routes
 app.get('/', (req, res) => {
