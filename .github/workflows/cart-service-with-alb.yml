@@ -1,9 +1,9 @@
-name: Deploy User Service
+name: Deploy cart Service
  
 on:
   push:
     paths:
-      - "user-service1/**"   # Triggered only when user-service code changes
+      - "cart-service/**"   # Triggered only when cart-service code changes
  
 jobs:
   build-and-deploy:
@@ -26,15 +26,15 @@ jobs:
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           AWS_REGION: ${{ secrets.REGION }} # 'ap-south-1' Set AWS Region explicitly
  
-      - name: Build and Push User Service Image
+      - name: Build and Push cart Service Image
         run: |
-          IMAGE_URI="${{ secrets.ECR_URI }}/user-service:latest"
-          docker build -t $IMAGE_URI ./user-service
+          IMAGE_URI="${{ secrets.ECR_URI }}/cart-service:latest"
+          docker build -t $IMAGE_URI ./cart-service
           docker push $IMAGE_URI
  
       - name: Update Task Definition
         run: |
-          sed -i 's#<IMAGE_URI>#${{ secrets.ECR_URI }}/user-service:latest#g' ./user-service/task-def.json
+          sed -i 's#<IMAGE_URI>#${{ secrets.ECR_URI }}/cart-service:latest#g' ./cart-service/task-def.json
  
       - name: Attach CloudWatch Logs Permissions to Task Execution Role
         run: |
@@ -48,7 +48,7 @@ jobs:
       - name: Register Task Definition
         run: |
           aws ecs register-task-definition \
-            --cli-input-json file://./user-service/task-def.json \
+            --cli-input-json file://./cart-service/task-def.json \
             --region ap-south-1
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
@@ -59,8 +59,8 @@ jobs:
         id: check-service
         run: |
           SERVICE_STATUS=$(aws ecs describe-services \
-            --cluster my-microservices \
-            --services user-service \
+            --cluster ${{ secrets.CLUSTER_NAME }} \
+            --services cart-service \
             --query 'services[0].status' \
             --output text --region ap-south-1)
           echo "Service Status: $SERVICE_STATUS"
@@ -76,39 +76,71 @@ jobs:
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           AWS_REGION: ${{ secrets.REGION }}
  
-      - name: Create or Update ECS Service
+      - name: Create or Update ECS Service with ALB
         run: |
           if [ "${{ steps.check-service.outputs.service-exists }}" == "true" ]; then
-            echo "Updating ECS service..."
+            echo "Updating ECS service with ALB..."
             aws ecs update-service \
-              --cluster my-microservices \
-              --service user-service \
-              --task-definition user-service:1 \
+              --cluster ${{ secrets.CLUSTER_NAME }} \
+              --service cart-service \
+              --task-definition cart-service:1 \
               --desired-count 1 \
-              --region ap-south-1
+              --region ap-south-1 \
+              --force-new-deployment
           else
-            echo "Creating ECS service..."
+            echo "Creating ECS service with ALB..."
             aws ecs create-service \
-              --cluster my-microservices \
-              --service-name user-service \
-              --task-definition user-service:1 \
+              --cluster ${{ secrets.CLUSTER_NAME }} \
+              --service-name cart-service \
+              --task-definition cart-service:1 \
               --desired-count 1 \
               --launch-type EC2 \
-              --region ap-south-1
+              --load-balancers '[{
+                "targetGroupArn": "arn:aws:elasticloadbalancing:ap-south-1:959620655722:targetgroup/cart-service-tg/84b6316ad847ce7e",
+                "containerName": "cart-service",
+                "containerPort": 3000
+              }]' \
+              --region ap-south-1 \
+              --health-check-grace-period-seconds 60
           fi
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          AWS_REGION: ${{ secrets.REGION }} # Set AWS Region explicitly
+          AWS_REGION: ${{ secrets.REGION }}
  
       - name: Deploy to ECS
         uses: aws-actions/amazon-ecs-deploy-task-definition@v1
         with:
-          task-definition: ./user-service/task-def.json
-          service: user-service
-          cluster: my-microservices
+          task-definition: ./cart-service/task-def.json
+          service: cart-service
+          cluster: ${{ secrets.CLUSTER_NAME }}
           wait-for-service-stability: true
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          AWS_REGION: ap-south-1
+          AWS_REGION: ${{ secrets.REGION }}
+
+    # Deploy API Gateway after ECS Service Deployment
+      - name: Deploy API Gateway
+        run: |
+          aws apigateway create-deployment \
+            --rest-api-id wc5wr9px90 \
+            --stage-name dev \
+            --description "Deploy API after cart-service deployment"
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: ${{ secrets.REGION }}
+
+
+      #  Flush API gateway Cache
+      - name: Flush API gateway Cache
+        run: |
+          aws apigateway flush-stage-cache \
+            --rest-api-id wc5wr9px90 \
+            --stage-name dev
+
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: ${{ secrets.REGION }}

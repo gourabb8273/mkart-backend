@@ -1,0 +1,38 @@
+{
+  "family": "cart-service",
+  "containerDefinitions": [
+    {
+      "name": "cart-service",
+      "image": "<IMAGE_URI>", 
+      "cpu": 512, 
+      "memory": 512, 
+      "essential": true,
+      "portMappings": [
+        { 
+          "containerPort": 3004,
+          "hostPort": 3005,
+          "protocol": "tcp"
+        } 
+      ],
+      "logConfiguration": {
+        "logDriver": "awslogs",
+        "options": {
+          "awslogs-group": "/ecs/cart-service",
+          "awslogs-region": "ap-south-1", 
+          "awslogs-stream-prefix": "cart-service"
+        }
+      },
+      "secrets": [
+        {
+          "name": "MONGO_URI",
+          "valueFrom": "arn:aws:secretsmanager:ap-south-1:959620655722:secret:MONGO_URI-SXIeDd"
+        }
+      ]
+
+    }
+  ],
+  "networkMode": "bridge",
+  "requiresCompatibilities": ["EC2"],
+  "executionRoleArn": "arn:aws:iam::959620655722:role/ecsTaskExecutionRole",
+  "taskRoleArn": "arn:aws:iam::959620655722:role/ecsTaskExecutionRole"
+}
