@@ -78,12 +78,16 @@ jobs:
  
       - name: Create or Update ECS Service with ALB
         run: |
+          # Fetch the latest revision of the task definition
+          LATEST_REVISION=$(aws ecs describe-task-definition --task-definition cart-service --region ap-south-1 --query 'taskDefinition.revision' --output text)
+          TASK_DEFINITION="cart-service:$LATEST_REVISION"
+
           if [ "${{ steps.check-service.outputs.service-exists }}" == "true" ]; then
             echo "Updating ECS service with ALB..."
             aws ecs update-service \
               --cluster ${{ secrets.CLUSTER_NAME }} \
               --service cart-service \
-              --task-definition cart-service:1 \
+              --task-definition $TASK_DEFINITION \
               --desired-count 1 \
               --region ap-south-1 \
               --force-new-deployment
@@ -92,13 +96,13 @@ jobs:
             aws ecs create-service \
               --cluster ${{ secrets.CLUSTER_NAME }} \
               --service-name cart-service \
-              --task-definition cart-service:1 \
+              --task-definition $TASK_DEFINITION \
               --desired-count 1 \
               --launch-type EC2 \
               --load-balancers '[{
                 "targetGroupArn": "arn:aws:elasticloadbalancing:ap-south-1:959620655722:targetgroup/cart-service-tg/fa9058f58e61a9f2",
                 "containerName": "cart-service",
-                "containerPort": 3003
+                "containerPort": 3002
               }]' \
               --region ap-south-1 \
               --health-check-grace-period-seconds 60
