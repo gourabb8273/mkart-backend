@@ -1,6 +1,10 @@
-import swaggerJsdoc from 'swagger-jsdoc';
-import dotenv from 'dotenv';
+// import swaggerJsdoc from 'swagger-jsdoc';
+// import dotenv from 'dotenv';
+// dotenv.config();
+const swaggerJsdoc = require('swagger-jsdoc');
+const dotenv = require('dotenv');
 dotenv.config();
+
 
 const options = {
   swaggerDefinition: {
