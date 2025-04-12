@@ -4,7 +4,7 @@ const isLocal = !process.env.AWS_EXECUTION_ENV;
 
 const serverUrl = isLocal
   ? `http://localhost:${process.env.PORT}`
-  : 'http://ecs-alb-2130983042.ap-south-1.elb.amazonaws.com/user';
+  : 'http://ecs-alb-2130983042.ap-south-1.elb.amazonaws.com/users';
 
 const options = {
   swaggerDefinition: {
