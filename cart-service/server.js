@@ -35,7 +35,7 @@ app.use('/cart', cartRoutes);
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 // Start server
-const PORT = process.env.PORT || 3004;
+const PORT = process.env.PORT || 3003;
 app.listen(PORT, () => {
   console.log(`Cart Service running on port ${PORT}`);
   console.log(`Swagger docs available at http://localhost:${PORT}/api-docs`);

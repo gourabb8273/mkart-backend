@@ -34,7 +34,7 @@ app.use('/orders', orderRoutes);
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 // Start server
-const PORT = process.env.PORT || 3003;
+const PORT = process.env.PORT || 3002;
 app.listen(PORT, () => {
   console.log(`Order Service running on port ${PORT}`);
   console.log(`Swagger docs available at http://localhost:${PORT}/api-docs`);
