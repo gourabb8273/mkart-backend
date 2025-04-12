@@ -14,7 +14,9 @@ connectDB();
 
 app.use(cors());
 app.use(express.json());
-
+app.get('/', (req, res) => {
+  res.send('Welcome to the Product Service!');
+});
 app.use('/products', productRoute);
 app.use('/inventory', inventoryRoutes);
 app.use('/reviews', reviewRoutes);
