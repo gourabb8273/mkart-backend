@@ -10,7 +10,7 @@
         "portMappings": [
           { 
             "containerPort": 3001,
-            "hostPort": 3003,
+            "hostPort": 3002,
             "protocol": "tcp"
           } 
         ],
