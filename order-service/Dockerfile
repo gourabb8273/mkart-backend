@@ -10,7 +10,7 @@ COPY package*.json ./
 # Install dependencies
 RUN npm install
 
-# Copy   application code to  the container
+# Copy  application code to  the container
 COPY . .
 
 # Expose port
