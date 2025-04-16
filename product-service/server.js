@@ -13,6 +13,14 @@ const PORT = process.env.PORT || 3001;
 connectDB();
 
 app.use(cors());
+
+app.use(cors({
+  origin: 'https://staging.d2m0s8prgmk8r.amplifyapp.com',  // Allow requests from the staging domain
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  credentials: true,  // If your request includes cookies or credentials
+}));
+
 app.use(express.json());
 app.get('/', (req, res) => {
   res.send('Welcome to the Product Service!');

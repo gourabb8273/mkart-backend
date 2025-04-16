@@ -4,7 +4,7 @@ FROM node:18-alpine
 # Set working directory
 WORKDIR /usr/src/app
 
-# Copy package.json and package-lock.json (if available)
+# Copy  package.json and package-lock.json (if available)
 COPY package*.json ./
 
 # Install dependencies

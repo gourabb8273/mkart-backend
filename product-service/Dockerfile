@@ -13,10 +13,10 @@ RUN npm install
 # Step 5: Copy the rest of the application files into the container
 COPY . .
 
-# Step 6: Expose port 5000 (change if your app listens on a different port)
+# Step 6:  Expose port 5000 (change if your app listens on a different port)
 EXPOSE 3001
 
-# Step 7: Set the environment  variable for NODE_ENV to "production"
+# Step 7: Set  the environment  variable for NODE_ENV to "production"
 ENV NODE_ENV=production
  
 # Step 8: Run the app using the command to start the server

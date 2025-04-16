@@ -2,7 +2,7 @@
 
 # Ignore node_modules in order-service
 node_modules/
-
+script.js
 # Ignore logs
 logs
 *.log
