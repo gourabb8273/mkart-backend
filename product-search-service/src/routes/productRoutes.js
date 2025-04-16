@@ -79,7 +79,7 @@ const router = express.Router();
 
 router.get('/', async (req, res) => {
   try {
-    const { category, gender, style, featured, popular, search } = req.query;
+    const { category, gender, style, featured, popular, query } = req.query;
     const atlasFilters = [];
     const matchFilters = {};
 
@@ -140,14 +140,14 @@ router.get('/', async (req, res) => {
     
     let pipeline = [];
 
-    if (search) {
+    if (query) {
       pipeline.push({
         $search: {
           index: "default",
           compound: {
             must: [{
               text: {
-                query: search,
+                query: query,
                 path: ["name", "description"],
                 fuzzy: { maxEdits: 2 }
               }
