@@ -1,0 +1,26 @@
+# Ignore node_modules in user-service
+
+# Ignore node_modules in order-service
+node_modules/
+script.js
+# Ignore logs
+logs
+*.log
+npm-debug.log*
+
+# OS-specific files
+.DS_Store
+Thumbs.db
+
+# Environment files
+.env
+
+# IDE configurations
+.vscode/
+.idea/
+
+# Build artifacts
+/dist
+
+# Optionally, if there’s a common node_modules folder in root (for monorepos)
+/node_modules/
