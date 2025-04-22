@@ -15,10 +15,10 @@ connectDB();
 app.use(cors());
 
 app.use(cors({
-  origin: 'https://staging.d2m0s8prgmk8r.amplifyapp.com',  // Allow requests from the staging domain
+  origin: '*', 
   methods: ['GET', 'POST', 'PUT', 'DELETE'],
   allowedHeaders: ['Content-Type', 'Authorization'],
-  credentials: true,  // If your request includes cookies or credentials
+  credentials: true,  
 }));
 
 app.use(express.json());
